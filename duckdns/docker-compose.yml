@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns
+    hostname: duckdns
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - SUBDOMAINS=$SUBDOMAINS
+      - TOKEN=$TOKEN
+      - LOG_FILE=true
+    volumes:
+      - $DOCKER_DATA/duckdns/config:/config
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
