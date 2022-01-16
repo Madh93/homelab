@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    hostname: traefik
+    restart: unless-stopped
+    environment:
+      - DO_AUTH_TOKEN=$DO_AUTH_TOKEN
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $DOCKER_DATA/traefik/acme.json:/acme.json
+      - $DOCKER_DATA/traefik/traefik.log:/traefik.log
+      - $DOCKER_DATA/traefik/credentials:/credentials:ro
+    command:
+      # API Dashboard
+      - "--api.dashboard=true"
+      # Docker discovery
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      # Entrypoints
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # HTTPS redirection
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      # Let's Encrypt
+      - "--certificatesResolvers.letsencrypt.acme.email=$LETS_ENCRYPT_EMAIL"
+      - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
+      # Logging settings
+      - "--log=true"
+      - "--log.level=WARN"
+      - "--accessLog=true"
+      - "--accessLog.filePath=/traefik.log"
+      - "--accessLog.bufferingSize=100"
+      - "--accessLog.filters.statusCodes=400-504"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.service=api@internal"
+      # Basic auth
+      - "traefik.http.routers.traefik.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials"
+    extra_hosts:
+      - host.docker.internal:172.17.0.1 # https://doc.traefik.io/traefik/providers/docker/#host-networking
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
