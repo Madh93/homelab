@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    hostname: jellyfin
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    ports:
+      - 8096:8096 # Required for old devices due DST Root CA X3 Expiration
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - $DOCKER_DATA/jellyfin/config:/config
+      - /volume1/media/Movies:/data/movies:ro
+      - /volume1/media/Shows:/data/tvshows:ro
+      - /volume1/media/LiveTV:/data/livetv:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+      - "traefik.http.routers.jellyfin.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.jellyfin.tls.certresolver=letsencrypt"
+    network_mode: host # Required for DLNA!
