@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  calibre:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre
+    hostname: calibre
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/calibre/config:/config
+      - /volume1/books:/books
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre.entrypoints=websecure"
+      - "traefik.http.services.calibre.loadbalancer.server.port=8083"
+      - "traefik.http.routers.calibre.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.calibre.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
