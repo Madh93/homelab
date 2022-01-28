@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    hostname: minio
+    restart: unless-stopped
+    user: $PUID:$PGID
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=$MINIO_ROOT_USER
+      - MINIO_ROOT_PASSWORD=$MINIO_ROOT_PASSWORD
+      - MINIO_BROWSER_REDIRECT_URL=https://$CONSOLE_DOMAIN_NAME
+    volumes:
+      - $DOCKER_DATA/minio:/data
+    labels:
+      - "traefik.enable=true"
+      # API
+      - "traefik.http.services.minio_api.loadbalancer.server.port=9000"
+      - "traefik.http.routers.minio_api.entrypoints=websecure"
+      - "traefik.http.routers.minio_api.rule=Host(`$API_DOMAIN_NAME`)"
+      - "traefik.http.routers.minio_api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.minio_api.service=minio_api"
+      # Console
+      - "traefik.http.services.minio_console.loadbalancer.server.port=9001"
+      - "traefik.http.routers.minio_console.entrypoints=websecure"
+      - "traefik.http.routers.minio_console.rule=Host(`$CONSOLE_DOMAIN_NAME`)"
+      - "traefik.http.routers.minio_console.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.minio_console.service=minio_console"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
