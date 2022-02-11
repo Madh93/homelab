@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    user: $PUID
+    volumes:
+      - $DOCKER_DATA/monitoring/grafana:/var/lib/grafana
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.rule=Host(`$GRAFANA_DOMAIN_NAME`)"
+      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    restart: unless-stopped
+    user: $PUID
+    command: --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - $DOCKER_DATA/monitoring/prometheus:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prometheus.entrypoints=websecure"
+      - "traefik.http.routers.prometheus.rule=Host(`$PROMETHEUS_DOMAIN_NAME`)"
+      - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
+
+  snmp_exporter:
+    image: quay.io/prometheus/snmp-exporter:master
+    container_name: snmp_exporter
+    hostname: snmp_exporter
+    restart: unless-stopped
+    user: $PUID
+    command: --config.file=/etc/snmp_exporter/snmp.yml
+    volumes:
+      - ./snmp.yml:/etc/snmp_exporter/snmp.yml
+    ports:
+      - 9116:9116
+    network_mode: host # Required!
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
