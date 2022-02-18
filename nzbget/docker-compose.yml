@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  nzbget:
+    image: lscr.io/linuxserver/nzbget:latest
+    container_name: nzbget
+    hostname: nzbget
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/nzbget/config:/config
+      - $DOWNLOADS_DATA:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.nzbget.loadbalancer.server.port=6789"
+      - "traefik.http.routers.nzbget.entrypoints=websecure"
+      - "traefik.http.routers.nzbget.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.nzbget.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
