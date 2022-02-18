@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  nzbhydra:
+    image: lscr.io/linuxserver/nzbhydra2:latest
+    container_name: nzbhydra
+    hostname: nzbhydra
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/nzbhydra/config:/config
+      - $DOCKER_DATA/nzbhydra/downloads:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.nzbhydra.loadbalancer.server.port=5076"
+      - "traefik.http.routers.nzbhydra.entrypoints=websecure"
+      - "traefik.http.routers.nzbhydra.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.nzbhydra.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
