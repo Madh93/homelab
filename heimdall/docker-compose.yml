@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:latest
+    container_name: heimdall
+    hostname: heimdall
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/heimdall/config:/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.heimdall.loadbalancer.server.port=80"
+      - "traefik.http.routers.heimdall.entrypoints=websecure"
+      - "traefik.http.routers.heimdall.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.heimdall.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
