@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  qbittorrent_vpn:
+    image: dperson/openvpn-client:latest
+    container_name: qbittorrent_vpn
+    hostname: qbittorrent_vpn
+    restart: unless-stopped
+    cap_add:
+      - net_admin # Required to work!
+    security_opt:
+      - label:disable
+    stdin_open: true
+    tty: true
+    ports:
+      - 6881:6881     # Bittorrent port forwarding
+      - 6881:6881/udp
+    environment:
+      - TZ=$TZ
+      - DNS=$DNS
+    volumes:
+      - /dev/net:/dev/net:z
+      - $DOCKER_DATA/qbittorrent_vpn/config:/vpn # Ensure to create 'vpn.conf' and 'vpn.auth' files!
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    depends_on:
+      - qbittorrent_vpn
+    network_mode: "service:qbittorrent_vpn"
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/qbittorrent/config:/config
+      - $DOWNLOADS_DATA:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+      - "traefik.http.routers.qbittorrent.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
