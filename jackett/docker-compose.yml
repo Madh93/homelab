@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    hostname: flaresolverr
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+      - TZ=$TZ
+
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    hostname: jackett
+    restart: unless-stopped
+    depends_on:
+      - flaresolverr
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/jackett/config:/config
+      - $DOCKER_DATA/jackett/downloads:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.jackett.loadbalancer.server.port=9117"
+      - "traefik.http.routers.jackett.entrypoints=websecure"
+      - "traefik.http.routers.jackett.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.jackett.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
