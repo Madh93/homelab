@@ -15,9 +15,10 @@ services:
     ports:
       - 6881:6881     # Bittorrent port forwarding
       - 6881:6881/udp
-    environment:
-      - TZ=$TZ
-      - DNS=$DNS
+    environment:  # TODO: https://github.com/dperson/openvpn-client/issues/359#issuecomment-761871972
+      TZ: $TZ
+      DNS: $DNS
+      FIREWALL: ''  # VPN Kill Switch (automatically disconnects when VPN connection drops out)
     volumes:
       - /dev/net:/dev/net:z
       - $DOCKER_DATA/qbittorrent_vpn/config:/vpn # Ensure to create 'vpn.conf' and 'vpn.auth' files!
