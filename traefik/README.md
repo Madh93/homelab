@@ -26,7 +26,7 @@ Amazon ECS, ...) and configures itself automatically and dynamically.
 ## Requirements
 
 - [A domain name](https://www.namecheap.com/)
-- [DigitalOcean account](https://www.digitalocean.com/)
+- [Cloudflare account](https://www.cloudflare.com/)
 
 ## Configuration
 
@@ -34,14 +34,14 @@ Amazon ECS, ...) and configures itself automatically and dynamically.
 
 It's necessary to register a domain name. In my case I use
 [Namecheap](https://www.namecheap.com/) but to manage the DNS records I use
-DigitalOcean instead so it's necessary to point to DigitalOcean the nameservers
-from Namecheap. More info [here](https://www.digitalocean.com/community/tutorials/how-to-point-to-digitalocean-nameservers-from-common-domain-registrars).
+Cloudflare instead so it's necessary to point to Cloudflare the nameservers
+from Namecheap. More info [here](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-cloudflare-account/).
 
 ### Lets Encrypt
 
 Traefik can use an ACME provider (like Let's Encrypt) for automatic certificate
 generation. When we get a certificate from Let’s Encrypt, theirs servers validate that we
-control the domain names in that certificate using “challenges,” as defined by
+control the domain names in that certificate using "challenges", as defined by
 the ACME standard. This validation is handled automatically by our ACME client
 (Traefik). The more important challenges are:
 
@@ -54,17 +54,17 @@ the ACME standard. This validation is handled automatically by our ACME client
 
 More info about Let's Encrypt challenge types [here](https://letsencrypt.org/docs/challenge-types/).
 
-Traefik supports DigitalOcean as DNS provider to automate the Let's Encrypt DNS
-verification. The necessary configuration is the next:
+Traefik supports Cloudflare as DNS provider to automate the Let's Encrypt DNS
+verification. We only need to create an [API Token](https://developers.cloudflare.com/api/tokens/create/). The necessary configuration is the next:
 
 ```yaml
 environment:
-  - DO_AUTH_TOKEN=$DO_AUTH_TOKEN
+  - CF_DNS_API_TOKEN=$CF_DNS_API_TOKEN
 command:
   - "--certificatesResolvers.letsencrypt.acme.email=$LETS_ENCRYPT_EMAIL"
   - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
   - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
-  - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
+  - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
 ```
 
 Traefik will automatically try to renew the certificate when less than 30 days
@@ -106,7 +106,7 @@ DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
 DOMAIN_NAME="traefik.domain.tld"
 LETS_ENCRYPT_EMAIL="alice@example.org"
-DO_AUTH_TOKEN="supersecret"
+CF_DNS_API_TOKEN="supersecret"
 ```
 
 And deploy:
@@ -116,8 +116,9 @@ And deploy:
 ## Useful links
 
 - [Namecheap](https://www.namecheap.com/)
-- [DigitalOcean](https://www.digitalocean.com/)
-- [How to point to DigitalOcean Nameservers from Namecheap](https://www.digitalocean.com/community/tutorials/how-to-point-to-digitalocean-nameservers-from-common-domain-registrars)
+- [Cloudflare](https://www.cloudflare.com/)
+- [How to point to Cloudflare Nameservers from Namecheap](https://www.namecheap.com/support/knowledgebase/article.aspx/9607/2210/how-to-set-up-dns-records-for-your-domain-in-cloudflare-account/)
+- [Creating Cloudflare API tokens](https://developers.cloudflare.com/api/tokens/create/)
 - [Traefik](https://doc.traefik.io/traefik/)
 - [Traefik Tutorial](https://www.smarthomebeginner.com/traefik-2-docker-tutorial/)
 - [Traefik Quick Guide By Examples](https://github.com/DoTheEvo/Traefik-v2-examples/)

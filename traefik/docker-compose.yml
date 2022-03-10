@@ -7,7 +7,7 @@ services:
     hostname: traefik
     restart: unless-stopped
     environment:
-      - DO_AUTH_TOKEN=$DO_AUTH_TOKEN
+      - CF_DNS_API_TOKEN=$CF_DNS_API_TOKEN
     ports:
       - "80:80"
       - "443:443"
@@ -32,7 +32,7 @@ services:
       - "--certificatesResolvers.letsencrypt.acme.email=$LETS_ENCRYPT_EMAIL"
       - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=digitalocean"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
       # Logging settings
       - "--log=true"
       - "--log.level=WARN"
