@@ -1,31 +1,30 @@
 terraform {
-  required_version = "~> 1.0"
+  required_version = "~> 1.1"
 
   required_providers {
-    digitalocean = {
-      source  = "digitalocean/digitalocean"
-      version = "2.17.0"
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "3.10.1"
     }
   }
 }
 
-variable "do_token" {}
+variable "cloudflare_token" {}
 variable "domain_name" {}
 variable "record_name" {}
 variable "record_value" {}
 
-provider "digitalocean" {
-  token = var.do_token
+provider "cloudflare" {
+  api_token = var.cloudflare_token
 }
 
-data "digitalocean_domain" "default" {
+data "cloudflare_zone" "default" {
   name = var.domain_name
 }
-
-resource "digitalocean_record" "default" {
-  domain = data.digitalocean_domain.default.name
-  type   = "CNAME"
-  name   = var.record_name
-  value  = var.record_value
-  ttl    = "43200"
+resource "cloudflare_record" "default" {
+  zone_id = data.cloudflare_zone.default.id
+  type    = "CNAME"
+  name    = var.record_name
+  value   = var.record_value
+  proxied = true
 }
