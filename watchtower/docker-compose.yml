@@ -9,7 +9,7 @@ services:
     environment:
       - TZ=$TZ
       - WATCHTOWER_SCHEDULE=0 0 4 * * ?
-      - WATCHTOWER_MONITOR_ONLY=true
+      - WATCHTOWER_MONITOR_ONLY=false
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
       - WATCHTOWER_NOTIFICATION_URL=telegram://$TELEGRAM_AUTH_TOKEN@telegram?channels=$TELEGRAM_CHAT_ID&parseMode=HTML
