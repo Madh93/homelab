@@ -14,10 +14,11 @@ services:
       - $DOCKER_DATA/adguard/conf:/opt/adguardhome/conf
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.adguard.entrypoints=websecure"
       - "traefik.http.services.adguard.loadbalancer.server.port=80" # 3000 on first boot
+      - "traefik.http.routers.adguard.entrypoints=websecure"
       - "traefik.http.routers.adguard.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.adguard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.adguard.middlewares=lan-only"
 
 networks:
   default:

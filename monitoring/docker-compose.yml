@@ -15,6 +15,7 @@ services:
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.rule=Host(`$GRAFANA_DOMAIN_NAME`)"
       - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.grafana.middlewares=lan-only"
 
   prometheus:
     image: prom/prometheus:latest
@@ -32,6 +33,7 @@ services:
       - "traefik.http.routers.prometheus.entrypoints=websecure"
       - "traefik.http.routers.prometheus.rule=Host(`$PROMETHEUS_DOMAIN_NAME`)"
       - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.prometheus.middlewares=lan-only"
 
   snmp_exporter:
     image: quay.io/prometheus/snmp-exporter:master

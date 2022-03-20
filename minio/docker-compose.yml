@@ -22,12 +22,14 @@ services:
       - "traefik.http.routers.minio_api.rule=Host(`$API_DOMAIN_NAME`)"
       - "traefik.http.routers.minio_api.tls.certresolver=letsencrypt"
       - "traefik.http.routers.minio_api.service=minio_api"
+      - "traefik.http.routers.minio_api.middlewares=lan-only"
       # Console
       - "traefik.http.services.minio_console.loadbalancer.server.port=9001"
       - "traefik.http.routers.minio_console.entrypoints=websecure"
       - "traefik.http.routers.minio_console.rule=Host(`$CONSOLE_DOMAIN_NAME`)"
       - "traefik.http.routers.minio_console.tls.certresolver=letsencrypt"
       - "traefik.http.routers.minio_console.service=minio_console"
+      - "traefik.http.routers.minio_console.middlewares=lan-only"
 
 networks:
   default:

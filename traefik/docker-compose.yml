@@ -46,9 +46,12 @@ services:
       - "traefik.http.routers.traefik.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=dashboard-auth,lan-only"
+      # --- Middlewares ---
       # Basic auth
-      - "traefik.http.routers.traefik.middlewares=dashboard-auth"
       - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials"
+      # IP Whitelist (LAN Only)
+      - "traefik.http.middlewares.lan-only.ipwhitelist.sourceRange=$HOME_SUBNET"
     extra_hosts:
       - host.docker.internal:172.17.0.1 # https://doc.traefik.io/traefik/providers/docker/#host-networking
 

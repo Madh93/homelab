@@ -15,10 +15,11 @@ services:
       - /volume1/books:/books
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.calibre.entrypoints=websecure"
       - "traefik.http.services.calibre.loadbalancer.server.port=8083"
+      - "traefik.http.routers.calibre.entrypoints=websecure"
       - "traefik.http.routers.calibre.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.calibre.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.calibre.middlewares=lan-only"
 
 networks:
   default:

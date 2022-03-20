@@ -11,10 +11,11 @@ services:
       - $DOCKER_DATA/portainer/data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portainer.middlewares=lan-only"
 
 networks:
   default:

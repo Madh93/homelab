@@ -6,6 +6,7 @@
   * [DNS setup](#dns-setup)
   * [Lets Encrypt](#lets-encrypt)
   * [Dashboard auth](#dashboard-auth)
+  * [IP Whitelist](#ip-whitelist)
   * [Docker setup](#docker-setup)
 - [Useful links](#useful-links)
 
@@ -73,7 +74,7 @@ is remaining.
 ### Dashboard auth
 
 The Traefik API built-in dashboard does not have authentication by default. This
-can be solved using Traefik itself using the BasicAuth middleware.
+can be solved with Traefik itself using the [BasicAuth middleware](https://doc.traefik.io/traefik/middlewares/http/basicauth/).
 
 To generate the password file:
 
@@ -87,6 +88,19 @@ volumes:
 labels:
   - "traefik.http.routers.traefik.middlewares=dashboard-auth"
   - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials"
+```
+
+### IP Whitelist
+
+We can limit the Traefik API built-in dashboard (and others services too) to
+specific IPs. This can be solved with Traefik itself using the [IPWhiteList middleware](https://doc.traefik.io/traefik/middlewares/http/ipwhitelist/).
+
+And add the next configuration:
+
+```yaml
+labels:
+  - "traefik.http.routers.traefik.middlewares=lan-only"
+  - "traefik.http.middlewares.lan-only.ipwhitelist.sourceRange=192.168.0.0/24"
 ```
 
 ### Docker setup
@@ -107,6 +121,7 @@ DEFAULT_NETWORK="badassnet"
 DOMAIN_NAME="traefik.domain.tld"
 LETS_ENCRYPT_EMAIL="alice@example.org"
 CF_DNS_API_TOKEN="supersecret"
+HOME_SUBNET="192.168.0.0/24"
 ```
 
 And deploy:
@@ -122,5 +137,7 @@ And deploy:
 - [Traefik](https://doc.traefik.io/traefik/)
 - [Traefik Tutorial](https://www.smarthomebeginner.com/traefik-2-docker-tutorial/)
 - [Traefik Quick Guide By Examples](https://github.com/DoTheEvo/Traefik-v2-examples/)
+- [Traefik HTTP Middlewares: BasicAuth ](https://doc.traefik.io/traefik/middlewares/http/basicauth/)
+- [Traefik HTTP Middlewares: IpWhitelist ](https://doc.traefik.io/traefik/middlewares/http/ipwhitelist/)
 - [Traefik Let's Encrypt Docs](https://doc.traefik.io/traefik/https/acme/)
 - [Let's Encrypt Challenge Types](https://letsencrypt.org/docs/challenge-types/)
