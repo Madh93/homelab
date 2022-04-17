@@ -1,6 +1,9 @@
 # Docker
 .env
 
+# Monitoring
+snmp.yml
+
 # Terraform
 .terraform
 *.tfstate*
