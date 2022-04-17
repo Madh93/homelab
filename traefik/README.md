@@ -111,7 +111,7 @@ We create an empty `acme.json` file for Let's Encrypt certificates:
 
 We create our Traefik network:
 
-    docker create network badassnet
+    docker network create badassnet
 
 We create a `.env` file:
 
