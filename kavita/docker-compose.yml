@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  kavita:
+    image: kizaing/kavita:latest
+    container_name: kavita
+    hostname: kavita
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:5000 || exit 1
+      start_period: 5s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/kavita/config:/kavita/config
+      - /volume1/comics:/manga
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.kavita.loadbalancer.server.port=5000"
+      - "traefik.http.routers.kavita.entrypoints=websecure"
+      - "traefik.http.routers.kavita.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.kavita.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.kavita.middlewares=lan-only"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
