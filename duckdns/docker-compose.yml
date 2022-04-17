@@ -19,3 +19,4 @@ services:
 networks:
   default:
     name: $DEFAULT_NETWORK
+    external: true
