@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  joplin_db:
+    image: postgres:13.6
+    container_name: joplin_db
+    hostname: joplin_db
+    restart: unless-stopped
+    volumes:
+      - $DOCKER_DATA/joplin/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$POSTGRES_DATABASE
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - joplin
+
+  joplin:
+    image: joplin/server:latest
+    container_name: joplin
+    hostname: joplin
+    restart: unless-stopped
+    depends_on:
+      - joplin_db
+    environment:
+      - APP_PORT=22300
+      - APP_BASE_URL=https://$DOMAIN_NAME
+      - DB_CLIENT=pg
+      - POSTGRES_HOST=joplin_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=$POSTGRES_DATABASE
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - default
+      - joplin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.joplin.loadbalancer.server.port=22300"
+      - "traefik.http.routers.joplin.entrypoints=websecure"
+      - "traefik.http.routers.joplin.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.joplin.tls.certresolver=letsencrypt"
+
+networks:
+  joplin:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
