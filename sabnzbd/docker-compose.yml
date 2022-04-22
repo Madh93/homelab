@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    hostname: sabnzbd
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/sabnzbd/config:/config
+      - $DOWNLOADS_DATA:/downloads
+      - $INCOMPLETE_DOWNLOADS_DATA:/incomplete-downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.sabnzbd.loadbalancer.server.port=8080"
+      - "traefik.http.routers.sabnzbd.entrypoints=websecure"
+      - "traefik.http.routers.sabnzbd.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.sabnzbd.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.sabnzbd.middlewares=lan-only"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
