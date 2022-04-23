@@ -16,7 +16,7 @@ services:
       - joplin
 
   joplin:
-    image: joplin/server:latest
+    image: joplin/server:2.7.4-beta
     container_name: joplin
     hostname: joplin
     restart: unless-stopped
