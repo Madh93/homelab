@@ -1,4 +1,4 @@
-# MinIO
+# Monitoring
 
 - [About](#about)
 - [Configuration](#configuration)
