@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    hostname: sonarr
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/sonarr/config:/config
+      - $TV_SHOWS_DATA:/tv
+      - $DOWNLOADS_DATA:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+      - "traefik.http.routers.sonarr.entrypoints=websecure"
+      - "traefik.http.routers.sonarr.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.sonarr.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.sonarr.middlewares=lan-only"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
