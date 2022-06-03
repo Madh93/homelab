@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  metube:
+    image: alexta69/metube:latest
+    container_name: metube
+    hostname: metube
+    restart: unless-stopped
+    user: $PUID:$PGID
+    environment:
+      - TZ=$TZ
+    volumes:
+      - $DOWNLOADS_DATA:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.metube.loadbalancer.server.port=8081"
+      - "traefik.http.routers.metube.entrypoints=websecure"
+      - "traefik.http.routers.metube.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.metube.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.metube.middlewares=metube-auth,lan-only"
+      # --- Middlewares ---
+      # Basic auth
+      - "traefik.http.middlewares.metube-auth.basicauth.usersfile=/credentials/metube"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
