@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  jenkins:
+    image: jenkins/jenkins:2.332.3-lts
+    container_name: jenkins
+    hostname: jenkins
+    restart: unless-stopped
+    user: $PUID:$PGID
+    environment:
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/jenkins/home:/var/jenkins_home
+      - $DOCKER_DATA/jenkins/homes:/var/services/homes
+      - /etc/passwd/:/etc/passwd:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.jenkins.loadbalancer.server.port=8080"
+      - "traefik.http.routers.jenkins.entrypoints=websecure"
+      - "traefik.http.routers.jenkins.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.jenkins.tls.certresolver=letsencrypt"
+      # --- Middlewares ---
+      # Custom IP Whitelist
+      - "traefik.http.routers.jenkins.middlewares=jenkins-whitelist"
+      - "traefik.http.middlewares.jenkins-whitelist.ipwhitelist.sourceRange=$JENKINS_WHITELIST"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
