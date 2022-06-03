@@ -49,7 +49,7 @@ services:
       - "traefik.http.routers.traefik.middlewares=dashboard-auth,lan-only"
       # --- Middlewares ---
       # Basic auth
-      - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
       # IP Whitelist (LAN Only)
       - "traefik.http.middlewares.lan-only.ipwhitelist.sourceRange=$HOME_SUBNET"
     extra_hosts:

@@ -78,7 +78,8 @@ can be solved with Traefik itself using the [BasicAuth middleware](https://doc.t
 
 To generate the password file:
 
-    htpasswd -c -b $DOCKER_DATA/traefik/credentials <USERNAME> <PASSWORD>
+    mkdir -p $DOCKER_DATA/traefik/credentials
+    htpasswd -c -b $DOCKER_DATA/traefik/credentials/traefik <USERNAME> <PASSWORD>
 
 And add the next configuration:
 
@@ -87,7 +88,7 @@ volumes:
   - $DOCKER_DATA/traefik/credentials:/credentials:ro
 labels:
   - "traefik.http.routers.traefik.middlewares=dashboard-auth"
-  - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials"
+  - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
 ```
 
 ### IP Whitelist
