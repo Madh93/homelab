@@ -37,9 +37,7 @@ services:
       - "--log=true"
       - "--log.level=WARN"
       - "--accessLog=true"
-      - "--accessLog.filePath=/traefik.log"
       - "--accessLog.bufferingSize=100"
-      - "--accessLog.filters.statusCodes=400-504"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=websecure"
