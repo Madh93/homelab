@@ -17,6 +17,45 @@ services:
       - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
       - "traefik.http.routers.grafana.middlewares=lan-only"
 
+  loki:
+    image: grafana/loki:2.5.0
+    container_name: loki
+    hostname: loki
+    restart: unless-stopped
+    user: $PUID
+    command: --config.file=/etc/loki/loki.yml
+    volumes:
+      - $DOCKER_DATA/monitoring/loki:/etc/koki
+      - ./loki.yml:/etc/loki/loki.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.loki.loadbalancer.server.port=3100"
+      - "traefik.http.routers.loki.entrypoints=websecure"
+      - "traefik.http.routers.loki.rule=Host(`$LOKI_DOMAIN_NAME`)"
+      - "traefik.http.routers.loki.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.loki.middlewares=lan-only"
+
+  promtail:
+    image: grafana/promtail:2.5.0
+    container_name: promtail
+    hostname: promtail
+    restart: unless-stopped
+    command: --config.file=/etc/promtail/promtail.yml
+    ports:
+      - 1514:1514 # Syslog Listener
+    volumes:
+      - $DOCKER_DATA/monitoring/promtail:/etc/promtail
+      - ./promtail.yml:/etc/promtail/promtail.yml:ro
+      - /var/log:/var/log:ro  # System Varlogs
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker Service Discovery
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.promtail.loadbalancer.server.port=9080"
+      - "traefik.http.routers.promtail.entrypoints=websecure"
+      - "traefik.http.routers.promtail.rule=Host(`$PROMTAIL_DOMAIN_NAME`)"
+      - "traefik.http.routers.promtail.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.promtail.middlewares=lan-only"
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
