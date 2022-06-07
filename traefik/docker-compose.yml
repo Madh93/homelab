@@ -11,6 +11,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8082:8082"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKER_DATA/traefik/acme.json:/acme.json
@@ -25,6 +26,7 @@ services:
       # Entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.metrics.address=:8082"
       # HTTPS redirection
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
@@ -33,6 +35,9 @@ services:
       - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      # Metrics settings
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entryPoint=metrics"
       # Logging settings
       - "--log=true"
       - "--log.level=WARN"

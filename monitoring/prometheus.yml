@@ -15,3 +15,9 @@ scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: 192.168.1.6:9116 # The SNMP exporter's real hostname:port
+  - job_name: traefik
+    static_configs:
+      - targets:
+          - traefik:8082
+    scrape_interval: 10s
+    scrape_timeout: 5s
