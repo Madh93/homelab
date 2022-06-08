@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  uptimekuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptimekuma
+    hostname: uptimekuma
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/uptimekuma/data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.uptimekuma.loadbalancer.server.port=3001"
+      - "traefik.http.routers.uptimekuma.entrypoints=websecure"
+      - "traefik.http.routers.uptimekuma.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.uptimekuma.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.uptimekuma.middlewares=lan-only"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
