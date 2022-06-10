@@ -18,6 +18,6 @@ scrape_configs:
   - job_name: traefik
     static_configs:
       - targets:
-          - traefik:8082
+          - traefik:8080
     scrape_interval: 10s
     scrape_timeout: 5s

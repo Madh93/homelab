@@ -9,9 +9,9 @@ services:
     environment:
       - CF_DNS_API_TOKEN=$CF_DNS_API_TOKEN
     ports:
-      - "80:80"
-      - "443:443"
-      - "8082:8082"
+      - 80:80
+      - 443:443
+      - 8080:8080 # Traefik internals (metrics, ping)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKER_DATA/traefik/acme.json:/acme.json
@@ -26,7 +26,7 @@ services:
       # Entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.metrics.address=:8082"
+      - "--entrypoints.internal.address=:8080"
       # HTTPS redirection
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
@@ -37,12 +37,15 @@ services:
       - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
       # Metrics settings
       - "--metrics.prometheus=true"
-      - "--metrics.prometheus.entryPoint=metrics"
+      - "--metrics.prometheus.entryPoint=internal"
       # Logging settings
       - "--log=true"
       - "--log.level=WARN"
       - "--accessLog=true"
       - "--accessLog.bufferingSize=100"
+      # Ping
+      - "--ping=true"
+      - "--ping.entryPoint=internal"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=websecure"
