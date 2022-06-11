@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  authelia:
+    image: authelia/authelia:4.35.6
+    container_name: authelia
+    hostname: authelia
+    restart: unless-stopped
+    environment:
+      - AUTHELIA_JWT_SECRET_FILE=/config/secrets/jwt
+      - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE=/config/secrets/encryption_key
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/authelia/config:/config
+      - ./configuration.yml:/config/configuration.yml
+      - ./users.yml:/config/users.yml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.authelia.tls.certresolver=letsencrypt"
+      # --- Authelia Middleware ---
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://$DOMAIN_NAME/"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true

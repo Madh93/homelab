@@ -1,8 +1,13 @@
 # Docker
 .env
 
+# Authelia
+authelia/configuration.yml
+authelia/users.yml
+
 # Monitoring
 snmp.yml
+
 
 # Terraform
 .terraform

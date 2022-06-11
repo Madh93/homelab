@@ -1,0 +1,11 @@
+---
+# More info: https://www.authelia.com/docs/configuration/authentication/file.html#format
+
+users:
+  john:
+    displayname: "John Doe"
+    password: "<PASSWORD_HASH>"
+    email: john.doe@authelia.com
+    groups:
+      - admins
+      - dev
