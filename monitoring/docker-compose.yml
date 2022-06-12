@@ -33,7 +33,7 @@ services:
       - "traefik.http.routers.loki.entrypoints=websecure"
       - "traefik.http.routers.loki.rule=Host(`$LOKI_DOMAIN_NAME`)"
       - "traefik.http.routers.loki.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.loki.middlewares=lan-only"
+      - "traefik.http.routers.loki.middlewares=authelia,lan-only"
 
   promtail:
     image: grafana/promtail:2.5.0
@@ -54,7 +54,7 @@ services:
       - "traefik.http.routers.promtail.entrypoints=websecure"
       - "traefik.http.routers.promtail.rule=Host(`$PROMTAIL_DOMAIN_NAME`)"
       - "traefik.http.routers.promtail.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.promtail.middlewares=lan-only"
+      - "traefik.http.routers.promtail.middlewares=authelia,lan-only"
 
   prometheus:
     image: prom/prometheus:latest
@@ -72,7 +72,7 @@ services:
       - "traefik.http.routers.prometheus.entrypoints=websecure"
       - "traefik.http.routers.prometheus.rule=Host(`$PROMETHEUS_DOMAIN_NAME`)"
       - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.prometheus.middlewares=lan-only"
+      - "traefik.http.routers.prometheus.middlewares=authelia,lan-only"
 
   snmp_exporter:
     image: quay.io/prometheus/snmp-exporter:master

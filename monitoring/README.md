@@ -10,6 +10,7 @@
   * [Loki config](#loki-config)
   * [Promtail config](#promtail-config)
   * [Docker setup](#docker-setup)
+  * [Authelia setup](#authelia-setup)
   * [Enable log sending](#enable-log-sending)
   * [Grafana dashboards](#grafana-dashboards)
 - [Useful links](#useful-links)
@@ -225,6 +226,25 @@ PUID=1000
 And deploy:
 
     docker-compose up -d
+
+### Authelia setup
+
+Promtail pushes logs to Loki so it's necessary to bypass `/loki/api/v1/push`
+endpoint if you try to use an external Promtail agent.
+
+Add the next rule to the Authelia `configuration.yml`:
+
+```yml
+access_control:
+  default_policy: deny
+  rules:
+    - domain: loki.domain.tdl
+      policy: bypass
+      methods:
+        - POST
+      resources:
+        - "^/loki/api/v1/push"
+```
 
 ### Enable log sending
 
