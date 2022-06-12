@@ -30,7 +30,7 @@ services:
       - "traefik.http.routers.jackett.entrypoints=websecure"
       - "traefik.http.routers.jackett.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.jackett.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.jackett.middlewares=lan-only"
+      - "traefik.http.routers.jackett.middlewares=authelia,lan-only"
 
 networks:
   default:
