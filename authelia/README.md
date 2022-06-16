@@ -21,7 +21,7 @@ redirected to Authelia's portal for authentication.
 
 ### Config files
 
-Create a `configuration.yml` for Authelia settings and ensure to add your [custom root domain](https://www.authelia.com/docs/configuration/session/#domain) for session management:
+Create a `configuration.yml` for Authelia settings and ensure to add your [custom root domain](https://www.authelia.com/configuration/session/introduction/#domain) for session management:
 
     cp configuraction.yml.example configuration.yml
 
@@ -30,7 +30,7 @@ Create a `users.yml` for Authelia user management:
     cp users.yml.example users.yml
 
 This file contains hashed passwords instead of plain text passwords. You can use
-Authelia docker image to generate a [hashed password](https://www.authelia.com/docs/configuration/authentication/file.html#passwords):
+Authelia docker image to generate a [hashed password](https://www.authelia.com/configuration/first-factor/file/#password):
 
     docker run --rm authelia/authelia authelia hash-password 'supersecret1234'
 
@@ -41,15 +41,15 @@ start by creating the secrets directory:
 
     mkdir -p $DOCKER_DATA/authelia/config/secrets
 
-Authelia supports multiple [storage backends](https://www.authelia.com/docs/configuration/storage/). The backend is used to store user
-preferences, 2FA device handles and secrets, authentication logs, etc. An [encryption key](https://www.authelia.com/docs/configuration/storage/#encryption_key) is used to encrypt data in the database.
+Authelia supports multiple [storage backends](https://www.authelia.com/configuration/storage/introduction/). The backend is used to store user
+preferences, 2FA device handles and secrets, authentication logs, etc. An [encryption key](https://www.authelia.com/configuration/storage/introduction/#encryption_key) is used to encrypt data in the database.
 
 To generate the encryption key file:
 
     echo '<SUPER_SECRET>' > $DOCKER_DATA/authelia/config/secrets/encryption_key
     chmod 400 $DOCKER_DATA/authelia/config/secrets/encryption_key
 
-Apart of that, it's necessary to define a [JWT secret](https://www.authelia.com/docs/configuration/miscellaneous.html#jwt_secret) for the identity verification process:
+Apart of that, it's necessary to define a [JWT secret](https://www.authelia.com/configuration/miscellaneous/introduction/#jwt_secret) for the identity verification process:
 
     echo '<SUPER_SECRET>' > $DOCKER_DATA/authelia/config/secrets/jwt
     chmod 400 $DOCKER_DATA/authelia/config/secrets/jwt
@@ -86,10 +86,10 @@ labels:
 
 After recreating container you will be redirect to the Authelia login page.
 Depending on the Authelia acces control rules you will get a forbidden or a
-successful authentication. More info [here](https://www.authelia.com/docs/configuration/access-control.html).
+successful authentication. More info [here](https://www.authelia.com/configuration/security/access-control/).
 
 ## Useful links
 
 - [Authelia](https://www.authelia.com/)
-- [Authelia example with Traefix integration](https://www.authelia.com/docs/deployment/supported-proxies/traefik2.x.html)
-- [Authelia configuration](https://www.authelia.com/docs/configuration/)
+- [Authelia example with Traefix integration](https://www.authelia.com/integration/proxies/traefik/)
+- [Authelia configuration](https://www.authelia.com/configuration/prologue/introduction/)
