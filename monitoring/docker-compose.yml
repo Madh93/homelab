@@ -25,7 +25,7 @@ services:
     user: $PUID
     command: --config.file=/etc/loki/loki.yml
     volumes:
-      - $DOCKER_DATA/monitoring/loki:/etc/koki
+      - $DOCKER_DATA/monitoring/loki:/tmp/loki
       - ./loki.yml:/etc/loki/loki.yml:ro
     labels:
       - "traefik.enable=true"
@@ -44,7 +44,6 @@ services:
     ports:
       - 1514:1514 # Syslog Listener
     volumes:
-      - $DOCKER_DATA/monitoring/promtail:/etc/promtail
       - ./promtail.yml:/etc/promtail/promtail.yml:ro
       - /var/log:/var/log:ro  # System Varlogs
       - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker Service Discovery
