@@ -185,7 +185,7 @@ scrape_configs:
         labels:
           job: varlogs
           host: NAS     # Synology NAS custom host name
-          __path__: /var/log/*.log
+          __path__: /var/log/**/*.log
   - job_name: syslog_listener
     syslog:
       listen_address: 0.0.0.0:1514
