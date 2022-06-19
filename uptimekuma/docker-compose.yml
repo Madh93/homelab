@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.uptimekuma.entrypoints=websecure"
       - "traefik.http.routers.uptimekuma.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.uptimekuma.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.uptimekuma.middlewares=lan-only"
+      - "traefik.http.routers.uptimekuma.middlewares=authelia,lan-only"
 
 networks:
   default:
