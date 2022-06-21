@@ -39,7 +39,7 @@ Go to `Admin` -> `Basic Configuration` -> `Feature Configuration`:
 1. Enable `Allow Reverse Proxy Authentication`
 2. Add `Remote-User` as `Reverse Proxy Header Name`
 
-More info [here](https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#traefik--241-with-authelia-forward-auth).
+More info [here](https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy/#traefik--241-with-authelia-forward-auth).
 
 #### OPDS support
 
