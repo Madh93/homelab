@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:14.3
+    container_name: miniflux_db
+    hostname: db
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready -U $POSTGRES_USER
+      interval: 10s
+      start_period: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - $DOCKER_DATA/miniflux/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$POSTGRES_DATABASE
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - miniflux
+
+  miniflux:
+    image: miniflux/miniflux:latest
+    container_name: miniflux
+    hostname: miniflux
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@db/$POSTGRES_DATABASE?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=$MINIFLUX_USER
+      - ADMIN_PASSWORD=$MINIFLUX_PASSWORD
+      - BASE_URL=https://$DOMAIN_NAME
+      - AUTH_PROXY_USER_CREATION=1
+      - AUTH_PROXY_HEADER=Remote-User
+    volumes:
+      - $DOCKER_DATA/miniflux/config:/config
+    networks:
+      - default
+      - miniflux
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.miniflux.loadbalancer.server.port=8080"
+      - "traefik.http.routers.miniflux.entrypoints=websecure"
+      - "traefik.http.routers.miniflux.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.miniflux.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.miniflux.middlewares=authelia,lan-only"
+
+networks:
+  miniflux:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
