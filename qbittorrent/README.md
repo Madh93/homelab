@@ -5,6 +5,7 @@
 - [Configuration](#configuration)
   * [OpenVPN client setup](#openvpn-client-setup)
   * [Docker setup](#docker-setup)
+  * [Authelia setup](#authelia-setup)
 - [Useful links](#useful-links)
 
 ## About
@@ -70,6 +71,22 @@ user@host:~$ curl ifconfig.me
 xxx.xxx.xxx.xxx # Should be your public IP
 user@host:~$ docker exec -it qbittorrent curl ifconfig.me
 xxx.xxx.xxx.xxx # Should be the VPN provider IP
+```
+
+### Authelia setup
+
+It's necessary to bypass `/api` if you want to use a third party application as [nzb360](https://nzb360.com).
+
+Add the next rule to the Authelia `configuration.yml`:
+
+```yml
+access_control:
+  default_policy: deny
+  rules:
+    - domain: qbittorrent.domain.tld
+      policy: bypass
+      resources:
+        - '^/api.*$'
 ```
 
 ## Useful links
