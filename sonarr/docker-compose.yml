@@ -20,7 +20,7 @@ services:
       - "traefik.http.routers.sonarr.entrypoints=websecure"
       - "traefik.http.routers.sonarr.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.sonarr.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.sonarr.middlewares=authelia,lan-only"
+      - "traefik.http.routers.sonarr.middlewares=authelia,lan-only,security-headers"
 
 networks:
   default:

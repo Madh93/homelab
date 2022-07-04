@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.nzbget.entrypoints=websecure"
       - "traefik.http.routers.nzbget.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.nzbget.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.nzbget.middlewares=lan-only"
+      - "traefik.http.routers.nzbget.middlewares=lan-only,security-headers"
 
 networks:
   default:

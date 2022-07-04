@@ -20,7 +20,7 @@ services:
       - "traefik.http.routers.radarr.entrypoints=websecure"
       - "traefik.http.routers.radarr.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.radarr.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.radarr.middlewares=authelia,lan-only"
+      - "traefik.http.routers.radarr.middlewares=authelia,lan-only,security-headers"
 
 networks:
   default:

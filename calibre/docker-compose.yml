@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.calibre.entrypoints=websecure"
       - "traefik.http.routers.calibre.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.calibre.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.calibre.middlewares=authelia,lan-only"
+      - "traefik.http.routers.calibre.middlewares=authelia,lan-only,security-headers"
 
 networks:
   default:

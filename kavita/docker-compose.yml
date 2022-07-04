@@ -25,7 +25,7 @@ services:
       - "traefik.http.routers.kavita.entrypoints=websecure"
       - "traefik.http.routers.kavita.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.kavita.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.kavita.middlewares=lan-only"
+      - "traefik.http.routers.kavita.middlewares=lan-only,security-headers"
 
 networks:
   default:

@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.freshrss.entrypoints=websecure"
       - "traefik.http.routers.freshrss.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.freshrss.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.freshrss.middlewares=authelia,lan-only"
+      - "traefik.http.routers.freshrss.middlewares=authelia,lan-only,security-headers"
 
 networks:
   default:

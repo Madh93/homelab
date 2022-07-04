@@ -21,7 +21,7 @@ services:
       - "traefik.http.routers.jenkins.tls.certresolver=letsencrypt"
       # --- Middlewares ---
       # Custom IP Whitelist
-      - "traefik.http.routers.jenkins.middlewares=jenkins-whitelist"
+      - "traefik.http.routers.jenkins.middlewares=jenkins-whitelist,security-headers"
       - "traefik.http.middlewares.jenkins-whitelist.ipwhitelist.sourceRange=$JENKINS_WHITELIST"
 
 networks:

@@ -52,12 +52,27 @@ services:
       - "traefik.http.routers.traefik.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=dashboard-auth,lan-only"
+      - "traefik.http.routers.traefik.middlewares=dashboard-auth,lan-only,security-headers"
       # --- Middlewares ---
       # Basic auth
       - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
       # IP Whitelist (LAN Only)
       - "traefik.http.middlewares.lan-only.ipwhitelist.sourceRange=$HOME_SUBNET"
+      # Security Headers: HTTP Strict Transport Security (HSTS)
+      - "traefik.http.middlewares.security-headers.headers.stsSeconds=63072000"
+      - "traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.security-headers.headers.stsPreload=true"
+      # Security Headers: X-Frame-Options
+      - "traefik.http.middlewares.security-headers.headers.customFrameOptionsValue=SAMEORIGIN"
+      # Security Headers: X-Content-Type-Options
+      - "traefik.http.middlewares.security-headers.headers.contentTypeNosniff=true"
+      # Security Headers: X-XSS-Protection
+      - "traefik.http.middlewares.security-headers.headers.browserXssFilter=true"
+      # Security Headers: Referrer-Policy
+      - "traefik.http.middlewares.security-headers.headers.referrerPolicy=same-origin"
+      # Security Headers: Permissions-Policy
+      - "traefik.http.middlewares.security-headers.headers.permissionsPolicy=camera=(),microphone=(),usb=()"
+
     extra_hosts:
       - host.docker.internal:172.17.0.1 # https://doc.traefik.io/traefik/providers/docker/#host-networking
 

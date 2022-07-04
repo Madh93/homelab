@@ -48,7 +48,7 @@ services:
       - "traefik.http.routers.miniflux.entrypoints=websecure"
       - "traefik.http.routers.miniflux.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.miniflux.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.miniflux.middlewares=authelia,lan-only"
+      - "traefik.http.routers.miniflux.middlewares=authelia,lan-only,security-headers"
 
 networks:
   miniflux:

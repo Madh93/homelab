@@ -20,7 +20,7 @@ services:
       - "traefik.http.routers.sabnzbd.entrypoints=websecure"
       - "traefik.http.routers.sabnzbd.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.sabnzbd.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.sabnzbd.middlewares=lan-only"
+      - "traefik.http.routers.sabnzbd.middlewares=lan-only,security-headers"
 
 networks:
   default:

@@ -17,7 +17,7 @@ services:
       - "traefik.http.routers.metube.entrypoints=websecure"
       - "traefik.http.routers.metube.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.metube.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.metube.middlewares=authelia,lan-only"
+      - "traefik.http.routers.metube.middlewares=authelia,lan-only,security-headers"
 
 networks:
   default:
