@@ -9,6 +9,10 @@ log:
   level: info
   format: text
 
+telemetry:
+  metrics:
+    enabled: true
+
 authentication_backend:
   file:
     path: /config/users.yml

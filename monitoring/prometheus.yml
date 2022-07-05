@@ -21,3 +21,9 @@ scrape_configs:
           - traefik:8080
     scrape_interval: 10s
     scrape_timeout: 5s
+  - job_name: authelia
+    static_configs:
+      - targets:
+          - authelia:9959
+    scrape_interval: 10s
+    scrape_timeout: 5s
