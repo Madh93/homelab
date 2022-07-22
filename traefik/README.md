@@ -7,6 +7,7 @@
   * [Lets Encrypt](#lets-encrypt)
   * [Dashboard auth](#dashboard-auth)
   * [IP Whitelist](#ip-whitelist)
+  * [Log rotating](#log-rotating)
   * [Docker setup](#docker-setup)
 - [Useful links](#useful-links)
 
@@ -104,6 +105,45 @@ labels:
   - "traefik.http.middlewares.lan-only.ipwhitelist.sourceRange=192.168.0.0/24"
 ```
 
+### Log rotating
+
+Traefik access logs are written to the standard output by default. To use
+fail2ban to ban malicious IP addresses we need to write the logs into a log
+file.
+
+Add the next configuration:
+
+```yaml
+volumes:
+  - /var/log/traefik:/logs
+command:
+  - "--accessLog=true"
+  - "--accessLog.filePath=logs/traefik.log"
+  - "--accessLog.bufferingSize=100"
+```
+
+We can use [logrotate](https://linux.die.net/man/8/logrotate) to allow automatic
+rotation, compression and removal of older log files.
+
+Create the next file:
+
+    touch /etc/logrotate.d/traefik
+
+And add the next configuration:
+
+```txt
+/var/log/traefik/*.log {
+  daily
+  size 1M
+  rotate 7
+  missingok
+  notifempty
+  postrotate
+    docker kill --signal="USR1" traefik
+  endscript
+}
+```
+
 ### Docker setup
 
 We create an empty `acme.json` file for Let's Encrypt certificates:
@@ -142,3 +182,4 @@ And deploy:
 - [Traefik HTTP Middlewares: IpWhitelist ](https://doc.traefik.io/traefik/middlewares/http/ipwhitelist/)
 - [Traefik Let's Encrypt Docs](https://doc.traefik.io/traefik/https/acme/)
 - [Let's Encrypt Challenge Types](https://letsencrypt.org/docs/challenge-types/)
+- [Rotating Traefik logs with logrotate](https://geekland.eu/configurar-la-rotacion-de-logs-en-traefik-con-logrotate/)

@@ -14,8 +14,8 @@ services:
       - 8080:8080 # Traefik internals (metrics, ping)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log/traefik:/logs
       - $DOCKER_DATA/traefik/acme.json:/acme.json
-      - $DOCKER_DATA/traefik/traefik.log:/traefik.log
       - $DOCKER_DATA/traefik/credentials:/credentials:ro
     command:
       # API Dashboard
@@ -42,6 +42,7 @@ services:
       - "--log=true"
       - "--log.level=WARN"
       - "--accessLog=true"
+      - "--accessLog.filePath=logs/traefik.log"
       - "--accessLog.bufferingSize=100"
       # Ping
       - "--ping=true"
