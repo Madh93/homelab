@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  fail2ban:
+    image: crazymax/fail2ban:latest
+    container_name: fail2ban
+    hostname: fail2ban
+    restart: unless-stopped
+    cap_add:
+      - net_admin
+      - net_raw
+    environment:
+      - TZ=$TZ
+      - F2B_LOG_TARGET=STDOUT
+      - F2B_LOG_LEVEL=INFO
+      - F2B_DB_PURGE_AGE=30d
+    volumes:
+      - $DOCKER_DATA/fail2ban/data:/data
+      - ./action.d:/data/action.d:ro
+      - ./filter.d:/data/filter.d:ro
+      - ./jail.d:/data/jail.d:ro
+      - /var/log:/var/log:ro
+    network_mode: host

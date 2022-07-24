@@ -1,0 +1,5 @@
+[Init]
+blocktype = DROP  # https://serverfault.com/questions/664160/fail2ban-error-on-setting-iptables-on-synology-nas/664298#664298
+
+[Init?family=inet6]
+blocktype = DROP
