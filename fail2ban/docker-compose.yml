@@ -14,10 +14,13 @@ services:
       - F2B_LOG_TARGET=STDOUT
       - F2B_LOG_LEVEL=INFO
       - F2B_DB_PURGE_AGE=30d
+      - TELEGRAM_AUTH_TOKEN=$TELEGRAM_AUTH_TOKEN  # Telegram notifications
+      - TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
     volumes:
       - $DOCKER_DATA/fail2ban/data:/data
       - ./action.d:/data/action.d:ro
       - ./filter.d:/data/filter.d:ro
       - ./jail.d:/data/jail.d:ro
+      - ./scripts:/data/scripts:ro
       - /var/log:/var/log:ro
     network_mode: host
