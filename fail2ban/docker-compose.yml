@@ -18,9 +18,27 @@ services:
       - TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
     volumes:
       - $DOCKER_DATA/fail2ban/data:/data
+      - $DOCKER_DATA/fail2ban/run:/var/run/fail2ban # Prometheus exporter
       - ./action.d:/data/action.d:ro
       - ./filter.d:/data/filter.d:ro
       - ./jail.d:/data/jail.d:ro
       - ./scripts:/data/scripts:ro
       - /var/log:/var/log:ro
     network_mode: host
+
+  fail2ban_exporter:
+    image: registry.gitlab.com/hectorjsmith/fail2ban-prometheus-exporter:latest
+    container_name: fail2ban_exporter
+    hostname: fail2ban_exporter
+    restart: unless-stopped
+    depends_on:
+      - fail2ban
+    volumes:
+      - $DOCKER_DATA/fail2ban/run:/var/run/fail2ban:ro
+    ports:
+      - 9191:9191
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
