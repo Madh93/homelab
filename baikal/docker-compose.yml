@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  baikal:
+    image: ckulka/baikal:nginx
+    container_name: baikal
+    hostname: baikal
+    restart: unless-stopped
+    environment:
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/baikal/config:/var/www/baikal/config
+      - $DOCKER_DATA/baikal/data:/var/www/baikal/Specific
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.baikal.loadbalancer.server.port=80"
+      - "traefik.http.routers.baikal.entrypoints=websecure"
+      - "traefik.http.routers.baikal.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.baikal.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.baikal.middlewares=lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
