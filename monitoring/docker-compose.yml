@@ -61,7 +61,9 @@ services:
     hostname: prometheus
     restart: unless-stopped
     user: $PUID
-    command: --config.file=/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=30d"
     volumes:
       - $DOCKER_DATA/monitoring/prometheus:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
