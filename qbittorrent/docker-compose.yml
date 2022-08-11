@@ -12,6 +12,8 @@ services:
       - label:disable
     stdin_open: true
     tty: true
+    devices:
+      - /dev/net/tun
     ports:
       - 6881:6881     # Bittorrent port forwarding
       - 6881:6881/udp
@@ -20,7 +22,6 @@ services:
       DNS: $DNS
       FIREWALL: ''  # VPN Kill Switch (automatically disconnects when VPN connection drops out)
     volumes:
-      - /dev/net:/dev/net:z
       - $DOCKER_DATA/qbittorrent_vpn/config:/vpn # Ensure to create 'vpn.conf' and 'vpn.auth' files!
 
   qbittorrent:
