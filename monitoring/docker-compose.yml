@@ -86,7 +86,6 @@ services:
       - ./snmp.yml:/etc/snmp_exporter/snmp.yml
     ports:
       - 9116:9116
-    network_mode: host # Required!
 
 networks:
   default:
