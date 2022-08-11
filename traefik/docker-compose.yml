@@ -22,6 +22,7 @@ services:
       - "--api.dashboard=true"
       # Docker discovery
       - "--providers.docker=true"
+      - "--providers.docker.network=$DEFAULT_NETWORK"
       - "--providers.docker.exposedByDefault=false"
       # Entrypoints
       - "--entrypoints.web.address=:80"
