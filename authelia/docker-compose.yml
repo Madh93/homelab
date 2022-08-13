@@ -10,8 +10,6 @@ services:
       - AUTHELIA_JWT_SECRET_FILE=/config/secrets/jwt
       - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE=/config/secrets/encryption_key
       - TZ=$TZ
-    ports:
-      - 9959:9959 # Optional Prometheus metrics
     volumes:
       - $DOCKER_DATA/authelia/config:/config
       - ./configuration.yml:/config/configuration.yml
