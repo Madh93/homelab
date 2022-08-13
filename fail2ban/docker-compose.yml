@@ -35,8 +35,6 @@ services:
       - fail2ban
     volumes:
       - $DOCKER_DATA/fail2ban/run:/var/run/fail2ban:ro
-    ports:
-      - 9191:9191
 
 networks:
   default:
