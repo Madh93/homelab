@@ -17,7 +17,7 @@ services:
       - "traefik.http.routers.baikal.entrypoints=websecure"
       - "traefik.http.routers.baikal.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.baikal.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.baikal.middlewares=lan-only,security-headers"
+      - "traefik.http.routers.baikal.middlewares=authelia,lan-only,security-headers"
 
 networks:
   default:
