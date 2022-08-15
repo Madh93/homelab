@@ -3,6 +3,7 @@
 - [About](#about)
 - [Configuration](#configuration)
   * [Docker setup](#docker-setup)
+  * [Authelia setup](#authelia-setup)
 - [Useful links](#useful-links)
 
 ## About
@@ -29,6 +30,22 @@ TZ="Europe/Madrid"
 And deploy:
 
     docker-compose up -d
+
+### Authelia setup
+
+It's necessary to bypass `/api` if you want to use a third party application as [nzb360](https://nzb360.com).
+
+Add the next rule to the Authelia `configuration.yml`:
+
+```yml
+access_control:
+  default_policy: deny
+  rules:
+    - domain: sabnzbd.domain.tld
+      policy: bypass
+      resources:
+        - '^/api.*$'
+```
 
 ## Useful links
 
