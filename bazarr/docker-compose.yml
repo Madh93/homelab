@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    hostname: bazarr
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/bazarr/config:/config
+      - $MOVIES_DATA:/movies
+      - $TV_SHOWS_DATA:/tv
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.routers.bazarr.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.bazarr.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bazarr.middlewares=authelia,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
