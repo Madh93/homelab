@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  cyberchef:
+    image: mpepping/cyberchef:latest
+    container_name: cyberchef
+    hostname: cyberchef
+    restart: unless-stopped
+    environment:
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.cyberchef.loadbalancer.server.port=8000"
+      - "traefik.http.routers.cyberchef.entrypoints=websecure"
+      - "traefik.http.routers.cyberchef.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.cyberchef.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.cyberchef.middlewares=authelia,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
