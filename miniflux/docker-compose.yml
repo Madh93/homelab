@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   db:
-    image: postgres:14.3
+    image: postgres:14.5
     container_name: miniflux_db
     hostname: db
     restart: unless-stopped
