@@ -8,8 +8,10 @@ authelia/users.yml
 # Monitoring
 snmp.yml
 
-
 # Terraform
 .terraform
 *.tfstate*
 *.tfvars
+
+# Others
+.ignored_bash_aliases

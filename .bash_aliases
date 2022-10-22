@@ -3,7 +3,7 @@ alias dp='docker ps'
 alias dtail='docker logs -tf --tail="50" "$@"'
 alias dcup='docker-compose up -d'
 alias dcdown='docker-compose down'
-alias dclogs='docker-compose logs -tf --tail="50"'  
+alias dclogs='docker-compose logs -tf --tail="50"'
 alias dcpull='docker-compose pull'
 
 # Docker Compose like a pro
