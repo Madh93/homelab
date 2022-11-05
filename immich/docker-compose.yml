@@ -1,0 +1,118 @@
+version: "3.9"
+
+services:
+  immich_server:
+    image: altran1502/immich-server:$IMMICH_VERSION
+    container_name: immich_server
+    hostname: immich-server
+    restart: unless-stopped
+    depends_on:
+      - immich_redis
+      - immich_db
+    entrypoint: ["/bin/sh", "./start-server.sh"]
+    volumes:
+      - $UPLOAD_LOCATION:/usr/src/app/upload
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=$JWT_SECRET
+      - DB_HOSTNAME=immich_db
+      - DB_DATABASE_NAME=$POSTGRES_DB
+      - DB_USERNAME=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - default
+      - immich
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.immich_api.loadbalancer.server.port=3001"
+      - "traefik.http.routers.immich_api.entrypoints=websecure"
+      - "traefik.http.routers.immich_api.rule=Host(`$DOMAIN_NAME`) && Pathprefix(`/api`)"
+      - "traefik.http.routers.immich_api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.immich_api.middlewares=lan-only,security-headers,immich_api_strip"
+      # --- Immich API Middleware ---
+      - "traefik.http.middlewares.immich_api_strip.stripprefix.prefixes=/api"
+
+  immich_microservices:
+    image: altran1502/immich-server:$IMMICH_VERSION
+    container_name: immich_microservices
+    hostname: immich-microservices
+    restart: unless-stopped
+    depends_on:
+      - immich_redis
+      - immich_db
+    entrypoint: ["/bin/sh", "./start-microservices.sh"]
+    volumes:
+      - $UPLOAD_LOCATION:/usr/src/app/upload
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=$JWT_SECRET
+      - DB_HOSTNAME=immich_db
+      - DB_DATABASE_NAME=$POSTGRES_DB
+      - DB_USERNAME=$POSTGRES_USER
+      - DB_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - immich
+
+  immich_machine_learning:
+    # image: altran1502/immich-machine-learning:$IMMICH_VERSION
+    image: my-immich-machine-learning:$IMMICH_VERSION # TODO: https://github.com/immich-app/immich/discussions/300
+    container_name: immich_machine_learning
+    hostname: immich-machine-learning
+    restart: unless-stopped
+    depends_on:
+      - immich_db
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    volumes:
+      - $UPLOAD_LOCATION:/usr/src/app/upload
+    environment:
+      - NODE_ENV=production
+    networks:
+      - immich
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false" # Disable Watchtower
+
+  immich_web:
+    image: altran1502/immich-web:$IMMICH_VERSION
+    container_name: immich_web
+    hostname: immich-web
+    restart: unless-stopped
+    user: $PUID:$PGID
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    networks:
+      - default
+      - immich
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.immich_web.loadbalancer.server.port=3000"
+      - "traefik.http.routers.immich_web.entrypoints=websecure"
+      - "traefik.http.routers.immich_web.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.immich_web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.immich_web.middlewares=lan-only,security-headers"
+
+  immich_redis:
+    image: redis:6.2
+    container_name: immich_redis
+    hostname: immich_redis
+    restart: unless-stopped
+    networks:
+      - immich
+
+  immich_db:
+    image: postgres:14.5
+    container_name: immich_db
+    hostname: immich_db
+    restart: unless-stopped
+    volumes:
+      - $DOCKER_DATA/immich/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - immich
+
+networks:
+  immich:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true

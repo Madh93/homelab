@@ -15,3 +15,4 @@ snmp.yml
 
 # Others
 .ignored_bash_aliases
+immich/ml_without_avx
