@@ -14,6 +14,7 @@ services:
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
       - WATCHTOWER_NOTIFICATION_URL=telegram://$TELEGRAM_AUTH_TOKEN@telegram?channels=$TELEGRAM_CHAT_ID&parseMode=HTML
       - WATCHTOWER_NOTIFICATION_TEMPLATE=🆕🔔💻 <b>Servidor:</b> <code>NAS</code>{{println}}{{range .}}{{.Message}}{{println}}{{end}}
+      - WATCHTOWER_NOTIFICATION_SKIP_TITLE=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
