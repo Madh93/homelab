@@ -20,7 +20,7 @@ services:
       - "traefik.http.routers.deemix.entrypoints=websecure"
       - "traefik.http.routers.deemix.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.deemix.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.deemix.middlewares=lan-only,security-headers"
+      - "traefik.http.routers.deemix.middlewares=authelia,lan-only,security-headers"
 
 networks:
   default:
