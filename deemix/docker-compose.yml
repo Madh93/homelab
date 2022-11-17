@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  deemix:
+    image: registry.gitlab.com/bockiii/deemix-docker:latest
+    container_name: deemix
+    hostname: deemix
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - DEEMIX_SINGLE_USER=true
+    volumes:
+      - $DOCKER_DATA/deemix/config:/deemix/config
+      - $DOWNLOADS_DATA:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.deemix.loadbalancer.server.port=6595"
+      - "traefik.http.routers.deemix.entrypoints=websecure"
+      - "traefik.http.routers.deemix.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.deemix.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.deemix.middlewares=lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
