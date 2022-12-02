@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: syncthing
+    restart: unless-stopped
+    ports:
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      # - 21027:21027/udp # Required for Discovery!
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/syncthing/config:/config
+      - $SYNC_DATA:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+      - "traefik.http.routers.syncthing.entrypoints=websecure"
+      - "traefik.http.routers.syncthing.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.syncthing.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.syncthing.middlewares=authelia,error-pages,lan-only,security-headers"
+    # network_mode: host # Required for Discovery!
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
