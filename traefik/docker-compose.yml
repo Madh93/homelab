@@ -53,7 +53,7 @@ services:
       - "traefik.http.routers.traefik.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=dashboard-auth,lan-only,security-headers"
+      - "traefik.http.routers.traefik.middlewares=dashboard-auth,error-pages,lan-only,security-headers"
       # --- Middlewares ---
       # Basic auth
       - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
@@ -73,10 +73,31 @@ services:
       - "traefik.http.middlewares.security-headers.headers.referrerPolicy=same-origin"
       # Security Headers: Permissions-Policy
       - "traefik.http.middlewares.security-headers.headers.permissionsPolicy=camera=(),microphone=(),usb=()"
-
     extra_hosts:
       - host.docker.internal:172.17.0.1 # https://doc.traefik.io/traefik/providers/docker/#host-networking
 
+  errorpages:
+    image: tarampampam/error-pages:latest
+    container_name: errorpages
+    hostname: errorpages
+    restart: unless-stopped
+    depends_on:
+      - traefik
+    environment:
+      - TEMPLATE_NAME=$ERROR_PAGES_TEMPLATE
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.errorpages.loadbalancer.server.port=8080"
+      - "traefik.http.routers.errorpages.entrypoints=websecure"
+      - "traefik.http.routers.errorpages.tls.certresolver=letsencrypt"
+      # Fallback for any NON-registered services
+      - "traefik.http.routers.errorpages.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.errorpages.priority=10"
+      - "traefik.http.routers.errorpages.middlewares=error-pages"
+      # --- Error Pages Middleware ---
+      - "traefik.http.middlewares.error-pages.errors.status=400-599"
+      - "traefik.http.middlewares.error-pages.errors.service=errorpages"
+      - "traefik.http.middlewares.error-pages.errors.query=/{status}.html"
 networks:
   default:
     name: $DEFAULT_NETWORK

@@ -8,6 +8,7 @@
   * [Dashboard auth](#dashboard-auth)
   * [IP Whitelist](#ip-whitelist)
   * [Log rotating](#log-rotating)
+  * [Error pages](#error-pages)
   * [Docker setup](#docker-setup)
 - [Useful links](#useful-links)
 
@@ -144,6 +145,41 @@ And add the next configuration:
 }
 ```
 
+### Error pages
+
+We can replace the standard error pages of Traefik and other services with
+something original and pretty [error pages](https://github.com/tarampampam/error-pages).
+
+Add the next container:
+
+```yaml
+errorpages:
+  image: tarampampam/error-pages:latest
+  container_name: errorpages
+  hostname: errorpages
+  restart: unless-stopped
+  depends_on:
+    - traefik
+  environment:
+    - TEMPLATE_NAME=$ERROR_PAGES_TEMPLATE
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.services.errorpages.loadbalancer.server.port=8080"
+    - "traefik.http.routers.errorpages.entrypoints=websecure"
+    - "traefik.http.routers.errorpages.tls.certresolver=letsencrypt"
+    # Fallback for any NON-registered services
+    - "traefik.http.routers.errorpages.rule=HostRegexp(`{host:.+}`)"
+    - "traefik.http.routers.errorpages.priority=10"
+    - "traefik.http.routers.errorpages.middlewares=error-pages"
+    # --- Error Pages Middleware ---
+    - "traefik.http.middlewares.error-pages.errors.status=400-599"
+    - "traefik.http.middlewares.error-pages.errors.service=errorpages"
+    - "traefik.http.middlewares.error-pages.errors.query=/{status}.html"
+```
+
+Setting the `ERROR_PAGES_TEMPLATE` environment variable you can configure the
+template to use. You can preview all available templates [here](https://tarampampam.github.io/error-pages/).
+
 ### Docker setup
 
 We create an empty `acme.json` file for Let's Encrypt certificates:
@@ -163,6 +199,7 @@ DOMAIN_NAME="traefik.domain.tld"
 LETS_ENCRYPT_EMAIL="alice@example.org"
 CF_DNS_API_TOKEN="supersecret"
 HOME_SUBNET="192.168.0.0/24"
+ERROR_PAGES_TEMPLATE="connection"
 ```
 
 And deploy:
@@ -182,4 +219,5 @@ And deploy:
 - [Traefik HTTP Middlewares: IpWhitelist ](https://doc.traefik.io/traefik/middlewares/http/ipwhitelist/)
 - [Traefik Let's Encrypt Docs](https://doc.traefik.io/traefik/https/acme/)
 - [Let's Encrypt Challenge Types](https://letsencrypt.org/docs/challenge-types/)
+- [Traefik with Error Pages](https://github.com/tarampampam/error-pages/wiki/Traefik-(docker-compose))
 - [Rotating Traefik logs with logrotate](https://geekland.eu/configurar-la-rotacion-de-logs-en-traefik-con-logrotate/)
