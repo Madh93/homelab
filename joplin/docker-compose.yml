@@ -40,7 +40,7 @@ services:
       - "traefik.http.routers.joplin.entrypoints=websecure"
       - "traefik.http.routers.joplin.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.joplin.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.joplin.middlewares=lan-only,security-headers"
+      - "traefik.http.routers.joplin.middlewares=error-pages,lan-only,security-headers"
 
 networks:
   joplin:
