@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   joplin_db:
-    image: postgres:13.8
+    image: postgres:15.1
     container_name: joplin_db
     hostname: joplin_db
     restart: unless-stopped
