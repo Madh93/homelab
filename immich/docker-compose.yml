@@ -98,7 +98,7 @@ services:
       - immich
 
   immich_db:
-    image: postgres:14.5
+    image: postgres:15.1
     container_name: immich_db
     hostname: immich_db
     restart: unless-stopped
