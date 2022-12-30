@@ -28,7 +28,7 @@ services:
       - "traefik.http.routers.immich_api.entrypoints=websecure"
       - "traefik.http.routers.immich_api.rule=Host(`$DOMAIN_NAME`) && Pathprefix(`/api`)"
       - "traefik.http.routers.immich_api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.immich_api.middlewares=lan-only,security-headers,immich_api_strip"
+      - "traefik.http.routers.immich_api.middlewares=authelia,error-pages,lan-only,security-headers,immich_api_strip"
       # --- Immich API Middleware ---
       - "traefik.http.middlewares.immich_api_strip.stripprefix.prefixes=/api"
 
@@ -87,7 +87,7 @@ services:
       - "traefik.http.routers.immich_web.entrypoints=websecure"
       - "traefik.http.routers.immich_web.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.immich_web.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.immich_web.middlewares=lan-only,security-headers"
+      - "traefik.http.routers.immich_web.middlewares=authelia,error-pages,lan-only,security-headers"
 
   immich_redis:
     image: redis:6.2
