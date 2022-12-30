@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    hostname: filebrowser
+    restart: unless-stopped
+    healthcheck:
+      test: curl --fail http://localhost:8080/health
+      start_period: 5s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    user: $PUID:$PGID
+    environment:
+      - TZ=$TZ
+      - FB_DATABASE=/filebrowser.db
+      - FB_PORT=8080
+      - FB_NOAUTH=true
+    volumes:
+      - $DOCKER_DATA/filebrowser/filebrowser.db:/filebrowser.db
+      - $DATA_LOCATION:/srv
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.filebrowser.loadbalancer.server.port=8080"
+      - "traefik.http.routers.filebrowser.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.filebrowser.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.filebrowser.middlewares=authelia,error-pages,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
