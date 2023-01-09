@@ -18,6 +18,7 @@ services:
       - /volume1/media/Movies:/data/movies:ro
       - /volume1/media/Shows:/data/tvshows:ro
       - /volume1/media/LiveTV:/data/livetv:ro
+      - /volume1/media/Home:/data/home:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.entrypoints=websecure"
