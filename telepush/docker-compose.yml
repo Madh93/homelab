@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  telepush:
+    image: ghcr.io/muety/telepush:latest
+    container_name: telepush
+    hostname: telepush
+    restart: unless-stopped
+    environment:
+      - APP_MODE=webhook
+      - APP_TOKEN=$TELEGRAM_AUTH_TOKEN
+      - APP_URL_SECRET=$URL_SECRET
+      - APP_METRICS=true
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/telepush/data:/srv/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.telepush.loadbalancer.server.port=8080"
+      - "traefik.http.routers.telepush.entrypoints=websecure"
+      - "traefik.http.routers.telepush.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.telepush.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.telepush.middlewares=authelia,error-pages,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
