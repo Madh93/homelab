@@ -8,6 +8,10 @@ authelia/users.yml
 # Monitoring
 snmp.yml
 
+# Telepush
+telepush/blacklist.txt
+telepush/whitelist.txt
+
 # Terraform
 .terraform
 *.tfstate*
