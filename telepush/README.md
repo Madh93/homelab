@@ -2,6 +2,7 @@
 
 - [About](#about)
 - [Configuration](#configuration)
+  * [Whitelist setup](#whitelist-setup)
   * [Docker setup](#docker-setup)
   * [Webhook setup](#webhook-setup)
   * [Authelia setup](#authelia-setup)  
@@ -15,6 +16,13 @@ for server monitoring, alerting, and anything else.
 
 ## Configuration
 
+### Whitelist setup
+
+Optionally, we should create a line-separated whitelist file containing Telegram
+user IDs with access:
+
+    touch $DOCKER_DATA/telepush/whitelist.txt
+
 ### Docker setup
 
 We create a `.env` file:
@@ -25,6 +33,7 @@ DEFAULT_NETWORK="badassnet"
 DOMAIN_NAME="telepush.domain.tld"
 TELEGRAM_AUTH_TOKEN="superBotSecret"
 URL_SECRET="randomString"
+APP_WHITELIST="whitelist.txt"
 TZ="Europe/Madrid"
 ```
 
@@ -34,7 +43,8 @@ And deploy:
 
 ### Webhook setup
 
-Set the webhook accordingly the [docs](https://core.telegram.org/bots/api#setwebhook):
+After deploying Telepush for the first time, we need to set the webhook
+accordingly the [docs](https://core.telegram.org/bots/api#setwebhook):
 
     curl -F "url=https://$DOMAIN_NAME/api/updates_$URL_SECRET" https://api.telegram.org/bot$TELEGRAM_AUTH_TOKEN/setWebhook
 

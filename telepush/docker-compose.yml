@@ -10,10 +10,12 @@ services:
       - APP_MODE=webhook
       - APP_TOKEN=$TELEGRAM_AUTH_TOKEN
       - APP_URL_SECRET=$URL_SECRET
+      - APP_WHITELIST=whitelist.txt
       - APP_METRICS=true
       - TZ=$TZ
     volumes:
       - $DOCKER_DATA/telepush/data:/srv/data
+      - ./whitelist.txt:/app/whitelist.txt
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.telepush.loadbalancer.server.port=8080"
