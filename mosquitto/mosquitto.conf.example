@@ -1,0 +1,9 @@
+# Security
+password_file /mosquitto/password_file
+
+# Persistence
+persistence true
+persistence_location /mosquitto/data
+
+# Access
+listener 1883

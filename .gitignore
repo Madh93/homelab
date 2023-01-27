@@ -8,6 +8,9 @@ authelia/users.yml
 # Monitoring
 snmp.yml
 
+# Mosquitto
+mosquitto.conf
+
 # Telepush
 telepush/blacklist.txt
 telepush/whitelist.txt
