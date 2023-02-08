@@ -6,7 +6,8 @@ authelia/configuration.yml
 authelia/users.yml
 
 # Monitoring
-snmp.yml
+monitoring/snmp.yml
+monitoring/promtail.yml
 
 # Mosquitto
 mosquitto.conf
