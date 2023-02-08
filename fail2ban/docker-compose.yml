@@ -11,7 +11,7 @@ services:
       - net_raw
     environment:
       - TZ=$TZ
-      - F2B_LOG_TARGET=STDOUT
+      - F2B_LOG_TARGET=/var/log/fail2ban.log
       - F2B_LOG_LEVEL=INFO
       - F2B_DB_PURGE_AGE=30d
       - TELEGRAM_AUTH_TOKEN=$TELEGRAM_AUTH_TOKEN  # Telegram notifications
@@ -23,7 +23,7 @@ services:
       - ./filter.d:/data/filter.d:ro
       - ./jail.d:/data/jail.d:ro
       - ./scripts:/data/scripts:ro
-      - /var/log:/var/log:ro
+      - /var/log:/var/log
     network_mode: host
 
   fail2ban_exporter:
