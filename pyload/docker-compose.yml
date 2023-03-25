@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  pyload:
+    image: lscr.io/linuxserver/pyload-ng:latest
+    container_name: pyload
+    hostname: pyload
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/pyload/config:/config
+      - $DOWNLOADS_DATA:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.pyload.loadbalancer.server.port=8000"
+      - "traefik.http.routers.pyload.entrypoints=websecure"
+      - "traefik.http.routers.pyload.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.pyload.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.pyload.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
