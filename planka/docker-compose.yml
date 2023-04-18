@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  planka_db:
+    image: postgres:15.1
+    container_name: planka_db
+    hostname: planka_db
+    restart: unless-stopped
+    volumes:
+      - $DOCKER_DATA/planka/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$POSTGRES_DATABASE
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - planka
+
+  planka:
+    image: ghcr.io/plankanban/planka:latest
+    container_name: planka
+    hostname: planka
+    restart: unless-stopped
+    depends_on:
+      - planka_db
+    command: >
+      bash -c
+        "for i in `seq 1 30`; do
+          ./start.sh &&
+          s=$$? && break || s=$$?;
+          echo \"Tried $$i times. Waiting 5 seconds...\";
+          sleep 5;
+        done; (exit $$s)"
+    ports:
+      - 3000:1337
+    environment:
+      - BASE_URL=https://$DOMAIN_NAME
+      - TRUST_PROXY=0
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@planka_db/$POSTGRES_DATABASE
+      - SECRET_KEY=$SECRET_KEY
+    volumes:
+      - $DOCKER_DATA/planka/data/user-avatars:/app/public/user-avatars
+      - $DOCKER_DATA/planka/data/project-background-images:/app/public/project-background-images
+      - $DOCKER_DATA/planka/data/attachments:/app/private/attachments
+    networks:
+      - default
+      - planka
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.planka.loadbalancer.server.port=1337"
+      - "traefik.http.routers.planka.entrypoints=websecure"
+      - "traefik.http.routers.planka.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.planka.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.planka.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  planka:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
