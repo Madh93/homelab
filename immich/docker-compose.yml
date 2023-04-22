@@ -9,12 +9,14 @@ services:
     depends_on:
       - immich_redis
       - immich_db
+      - immich_typesense
     entrypoint: ["/bin/sh", "./start-server.sh"]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
       - NODE_ENV=production
       - JWT_SECRET=$JWT_SECRET
+      - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
       - DB_HOSTNAME=immich_db
       - DB_DATABASE_NAME=$POSTGRES_DB
       - DB_USERNAME=$POSTGRES_USER
@@ -40,12 +42,14 @@ services:
     depends_on:
       - immich_redis
       - immich_db
+      - immich_typesense
     entrypoint: ["/bin/sh", "./start-microservices.sh"]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
       - NODE_ENV=production
       - JWT_SECRET=$JWT_SECRET
+      - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
       - DB_HOSTNAME=immich_db
       - DB_DATABASE_NAME=$POSTGRES_DB
       - DB_USERNAME=$POSTGRES_USER
@@ -61,15 +65,31 @@ services:
     restart: unless-stopped
     depends_on:
       - immich_db
-    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    command: ["python", "src/main.py"]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
+      - immich_model_cache:/cache
     environment:
       - NODE_ENV=production
     networks:
       - immich
     labels:
       - "com.centurylinklabs.watchtower.enable=false" # Disable Watchtower
+
+  immich_typesense:
+    image: typesense/typesense:0.24.0
+    container_name: immich_typesense
+    hostname: typesense
+    restart: unless-stopped
+    volumes:
+      - $DOCKER_DATA/immich/typesense:/data
+    environment:
+      - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
+      - TYPESENSE_DATA_DIR=/data
+    networks:
+      - immich
+    logging:
+      driver: none
 
   immich_web:
     image: altran1502/immich-web:$IMMICH_VERSION
@@ -116,3 +136,6 @@ networks:
   default:
     name: $DEFAULT_NETWORK
     external: true
+
+volumes:
+  immich_model_cache:

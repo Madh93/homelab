@@ -4,6 +4,7 @@
 - [Configuration](#configuration)
   * [Machine Learning requirements](#machine-learning-requirements)
   * [JWT setup](#jwt-setup)
+  * [Typesense setup](#jwt-setup)
   * [Docker setup](#docker-setup)
   * [Authelia setup](#authelia-setup)
 - [Useful links](#useful-links)
@@ -27,6 +28,12 @@ Before running Immich it's necessary to define a [JWT secret](https://immich.app
 
     openssl rand -base64 128
 
+### JWT setup
+
+Before running Immich it's necessary to define a [Typesense API Key](https://immich.app/docs/installation/recommended-installation#step-2---populate-the-env-file-with-custom-values) that will must be populated in the `.env` file as `TYPESENSE_API_KEY` environment variable:
+
+    openssl rand -base64 128
+
 ### Docker setup
 
 We create a `.env` file:
@@ -41,6 +48,7 @@ TZ="Europe/Madrid"
 IMMICH_VERSION="v1.45.0"
 UPLOAD_LOCATION="/media/photos"
 JWT_SECRET="supersecret" 
+TYPESENSE_API_KEY="supersecret"
 POSTGRES_DB="immich"
 POSTGRES_USER="immich"
 POSTGRES_PASSWORD="supersecret"
