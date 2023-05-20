@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    hostname: jellyseerr
+    restart: unless-stopped
+    user: $PUID:$PGID
+    environment:
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/jellyseerr/config:/app/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
+      - "traefik.http.routers.jellyseerr.entrypoints=websecure"
+      - "traefik.http.routers.jellyseerr.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.jellyseerr.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.jellyseerr.middlewares=error-pages,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
