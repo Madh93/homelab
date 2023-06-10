@@ -10,7 +10,7 @@ services:
       - immich_redis
       - immich_db
       - immich_typesense
-    entrypoint: ["/bin/sh", "./start-server.sh"]
+    command: ["start-server.sh"]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
@@ -43,7 +43,7 @@ services:
       - immich_redis
       - immich_db
       - immich_typesense
-    entrypoint: ["/bin/sh", "./start-microservices.sh"]
+    command: ["start-microservices.sh"]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
@@ -97,7 +97,6 @@ services:
     hostname: immich-web
     restart: unless-stopped
     user: $PUID:$PGID
-    entrypoint: ["/bin/sh", "./entrypoint.sh"]
     networks:
       - default
       - immich
