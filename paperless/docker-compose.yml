@@ -1,0 +1,74 @@
+version: "3.9"
+
+services:
+  paperless_redis:
+    image: redis:7.0
+    container_name: paperless_redis
+    hostname: paperless_redis
+    restart: unless-stopped
+    networks:
+      - paperless
+
+  paperless_db:
+    image: postgres:15.1
+    container_name: paperless_db
+    hostname: paperless_db
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready -U $POSTGRES_USER
+      interval: 10s
+      start_period: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - $DOCKER_DATA/paperless/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$POSTGRES_DATABASE
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - paperless
+
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless
+    hostname: paperless
+    restart: unless-stopped
+    depends_on:
+      - paperless_redis
+      - paperless_db
+    healthcheck:
+      test: curl -fs -S --max-time 2 http://localhost:8000
+      start_period: 5s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      - USERMAP_UID=$PUID
+      - USERMAP_GID=$PGID
+      - TZ=$TZ
+      - PAPERLESS_SECRET_KEY=$PAPERLESS_SECRET_KEY
+      - PAPERLESS_URL=https://$DOMAIN_NAME
+      - PAPERLESS_REDIS=redis://paperless_redis:6379
+      - PAPERLESS_DBHOST=paperless_db
+      - PAPERLESS_DBUSER=$POSTGRES_USER
+      - PAPERLESS_DBPASS=$POSTGRES_PASSWORD
+    volumes:
+      - $DOCKER_DATA/paperless/data:/usr/src/paperless/data
+      - $DATA_LOCATION:/usr/src/paperless/media
+    networks:
+      - default
+      - paperless
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.paperless.loadbalancer.server.port=8000"
+      - "traefik.http.routers.paperless.entrypoints=websecure"
+      - "traefik.http.routers.paperless.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.paperless.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.paperless.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  paperless:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
