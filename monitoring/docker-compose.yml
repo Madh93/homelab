@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.grafana.middlewares=error-pages,lan-only,security-headers"
 
   loki:
-    image: grafana/loki:2.7.4
+    image: grafana/loki:2.8.2
     container_name: loki
     hostname: loki
     restart: unless-stopped
@@ -36,7 +36,7 @@ services:
       - "traefik.http.routers.loki.middlewares=authelia,error-pages,lan-only,security-headers"
 
   promtail:
-    image: grafana/promtail:2.7.4
+    image: grafana/promtail:2.8.2
     container_name: promtail
     hostname: promtail
     restart: unless-stopped
