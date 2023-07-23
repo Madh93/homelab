@@ -15,7 +15,7 @@ services:
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.rule=Host(`$GRAFANA_DOMAIN_NAME`)"
       - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.grafana.middlewares=error-pages,lan-only,security-headers"
+      - "traefik.http.routers.grafana.middlewares=authelia,error-pages,lan-only,security-headers"
 
   loki:
     image: grafana/loki:2.8.2

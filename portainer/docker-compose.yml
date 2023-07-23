@@ -15,7 +15,7 @@ services:
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.portainer.middlewares=lan-only,security-headers"
+      - "traefik.http.routers.portainer.middlewares=authelia,error-pages,lan-only,security-headers"
 
 networks:
   default:

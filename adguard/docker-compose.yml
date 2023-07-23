@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.adguard.entrypoints=websecure"
       - "traefik.http.routers.adguard.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.adguard.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.adguard.middlewares=lan-only,security-headers"
+      - "traefik.http.routers.adguard.middlewares=authelia,error-pages,lan-only,security-headers"
 
 networks:
   default:
