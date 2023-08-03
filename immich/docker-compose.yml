@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   immich_server:
-    image: altran1502/immich-server:$IMMICH_VERSION
+    image: ghcr.io/immich-app/immich-server:$IMMICH_VERSION
     container_name: immich_server
     hostname: immich-server
     restart: unless-stopped
@@ -14,7 +14,6 @@ services:
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
-      - NODE_ENV=production
       - JWT_SECRET=$JWT_SECRET
       - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
       - DB_HOSTNAME=immich_db
@@ -35,7 +34,7 @@ services:
       - "traefik.http.middlewares.immich_api_strip.stripprefix.prefixes=/api"
 
   immich_microservices:
-    image: altran1502/immich-server:$IMMICH_VERSION
+    image: ghcr.io/immich-app/immich-server:$IMMICH_VERSION
     container_name: immich_microservices
     hostname: immich-microservices
     restart: unless-stopped
@@ -47,7 +46,6 @@ services:
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
-      - NODE_ENV=production
       - JWT_SECRET=$JWT_SECRET
       - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
       - DB_HOSTNAME=immich_db
@@ -58,7 +56,7 @@ services:
       - immich
 
   immich_machine_learning:
-    # image: altran1502/immich-machine-learning:$IMMICH_VERSION
+    # image: ghcr.io/immich-app/immich-machine-learning:$IMMICH_VERSION
     image: my-immich-machine-learning:$IMMICH_VERSION # TODO: https://github.com/immich-app/immich/discussions/300
     container_name: immich_machine_learning
     hostname: immich-machine-learning
@@ -67,10 +65,7 @@ services:
       - immich_db
     command: ["python", "src/main.py"]
     volumes:
-      - $UPLOAD_LOCATION:/usr/src/app/upload
       - immich_model_cache:/cache
-    environment:
-      - NODE_ENV=production
     networks:
       - immich
     labels:
@@ -88,11 +83,9 @@ services:
       - TYPESENSE_DATA_DIR=/data
     networks:
       - immich
-    logging:
-      driver: none
 
   immich_web:
-    image: altran1502/immich-web:$IMMICH_VERSION
+    image: ghcr.io/immich-app/immich-web:$IMMICH_VERSION
     container_name: immich_web
     hostname: immich-web
     restart: unless-stopped
