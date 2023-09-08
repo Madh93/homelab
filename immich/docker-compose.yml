@@ -10,7 +10,7 @@ services:
       - immich_redis
       - immich_db
       - immich_typesense
-    command: ["start-server.sh"]
+    command: [ "start.sh", "immich" ]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
@@ -42,7 +42,7 @@ services:
       - immich_redis
       - immich_db
       - immich_typesense
-    command: ["start-microservices.sh"]
+    command: [ "start.sh", "microservices" ]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
     environment:
@@ -63,7 +63,6 @@ services:
     restart: unless-stopped
     depends_on:
       - immich_db
-    command: ["python", "src/main.py"]
     volumes:
       - immich_model_cache:/cache
     networks:
@@ -81,6 +80,7 @@ services:
     environment:
       - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
       - TYPESENSE_DATA_DIR=/data
+      - GLOG_minloglevel=1
     networks:
       - immich
 
