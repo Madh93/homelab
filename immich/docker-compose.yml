@@ -9,14 +9,12 @@ services:
     depends_on:
       - immich_redis
       - immich_db
-      - immich_typesense
     command: [ "start.sh", "immich" ]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     environment:
       - JWT_SECRET=$JWT_SECRET
-      - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
       - DB_HOSTNAME=immich_db
       - DB_DATABASE_NAME=$POSTGRES_DB
       - DB_USERNAME=$POSTGRES_USER
@@ -40,14 +38,12 @@ services:
     depends_on:
       - immich_redis
       - immich_db
-      - immich_typesense
     command: [ "start.sh", "microservices" ]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     environment:
       - JWT_SECRET=$JWT_SECRET
-      - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
       - DB_HOSTNAME=immich_db
       - DB_DATABASE_NAME=$POSTGRES_DB
       - DB_USERNAME=$POSTGRES_USER
@@ -70,20 +66,6 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=false" # Disable Watchtower
 
-  immich_typesense:
-    image: typesense/typesense:0.24.0
-    container_name: immich_typesense
-    hostname: typesense
-    restart: unless-stopped
-    volumes:
-      - $DOCKER_DATA/immich/typesense:/data
-    environment:
-      - TYPESENSE_API_KEY=$TYPESENSE_API_KEY
-      - TYPESENSE_DATA_DIR=/data
-      - GLOG_minloglevel=1
-    networks:
-      - immich
-
   immich_redis:
     image: redis:6.2
     container_name: immich_redis
@@ -93,7 +75,7 @@ services:
       - immich
 
   immich_db:
-    image: postgres:15.1
+    image: tensorchord/pgvecto-rs:pg15-v0.1.11
     container_name: immich_db
     hostname: immich_db
     restart: unless-stopped
