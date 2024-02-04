@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.grafana.middlewares=authelia,error-pages,lan-only,security-headers"
 
   loki:
-    image: grafana/loki:2.9.2
+    image: grafana/loki:2.9.4
     container_name: loki
     hostname: loki
     restart: unless-stopped
@@ -36,7 +36,7 @@ services:
       - "traefik.http.routers.loki.middlewares=authelia,error-pages,lan-only,security-headers"
 
   promtail:
-    image: grafana/promtail:2.9.2
+    image: grafana/promtail:2.9.4
     container_name: promtail
     hostname: promtail
     restart: unless-stopped
@@ -76,7 +76,7 @@ services:
       - "traefik.http.routers.prometheus.middlewares=authelia,error-pages,lan-only,security-headers"
 
   snmp_exporter:
-    image: quay.io/prometheus/snmp-exporter:master
+    image: quay.io/prometheus/snmp-exporter:v0.25.0
     container_name: snmp_exporter
     hostname: snmp_exporter
     restart: unless-stopped
