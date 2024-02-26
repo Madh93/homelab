@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  librespeed:
+    image: lscr.io/linuxserver/librespeed:latest
+    container_name: librespeed
+    hostname: librespeed
+    restart: unless-stopped
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/librespeed/config:/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.librespeed.loadbalancer.server.port=80"
+      - "traefik.http.routers.librespeed.entrypoints=websecure"
+      - "traefik.http.routers.librespeed.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.librespeed.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.librespeed.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
