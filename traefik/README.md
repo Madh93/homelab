@@ -96,14 +96,14 @@ labels:
 ### IP Whitelist
 
 We can limit the Traefik API built-in dashboard (and others services too) to
-specific IPs. This can be solved with Traefik itself using the [IPWhiteList middleware](https://doc.traefik.io/traefik/middlewares/http/ipwhitelist/).
+specific IPs. This can be solved with Traefik itself using the [IPAllowList middleware](https://doc.traefik.io/traefik/middlewares/http/ipallowlist/).
 
 And add the next configuration:
 
 ```yaml
 labels:
   - "traefik.http.routers.traefik.middlewares=lan-only"
-  - "traefik.http.middlewares.lan-only.ipwhitelist.sourceRange=192.168.0.0/24"
+  - "traefik.http.middlewares.lan-only.ipallowlist.sourceRange=192.168.0.0/24"
 ```
 
 ### Log rotating
@@ -216,7 +216,7 @@ And deploy:
 - [Traefik Tutorial](https://www.smarthomebeginner.com/traefik-2-docker-tutorial/)
 - [Traefik Quick Guide By Examples](https://github.com/DoTheEvo/Traefik-v2-examples/)
 - [Traefik HTTP Middlewares: BasicAuth ](https://doc.traefik.io/traefik/middlewares/http/basicauth/)
-- [Traefik HTTP Middlewares: IpWhitelist ](https://doc.traefik.io/traefik/middlewares/http/ipwhitelist/)
+- [Traefik HTTP Middlewares: IPAllowList ](https://doc.traefik.io/traefik/middlewares/http/ipallowlist/)
 - [Traefik Let's Encrypt Docs](https://doc.traefik.io/traefik/https/acme/)
 - [Let's Encrypt Challenge Types](https://letsencrypt.org/docs/challenge-types/)
 - [Traefik with Error Pages](https://github.com/tarampampam/error-pages/wiki/Traefik-(docker-compose))

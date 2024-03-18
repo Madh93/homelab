@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   traefik:
-    image: traefik:2.10.7
+    image: traefik:2.11.0
     container_name: traefik
     hostname: traefik
     restart: unless-stopped
@@ -58,7 +58,7 @@ services:
       # Basic auth
       - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
       # IP Whitelist (LAN Only)
-      - "traefik.http.middlewares.lan-only.ipwhitelist.sourceRange=$HOME_SUBNET"
+      - "traefik.http.middlewares.lan-only.ipallowlist.sourceRange=$HOME_SUBNET"
       # Security Headers: HTTP Strict Transport Security (HSTS)
       - "traefik.http.middlewares.security-headers.headers.stsSeconds=63072000"
       - "traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains=true"
