@@ -75,7 +75,7 @@ services:
       - immich
 
   immich_db:
-    image: tensorchord/pgvecto-rs:pg15-v0.1.11
+    image: tensorchord/pgvecto-rs:pg15-v0.2.0
     container_name: immich_db
     hostname: immich_db
     restart: unless-stopped
