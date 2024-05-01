@@ -2,12 +2,12 @@ version: "3.9"
 
 services:
   authelia:
-    image: authelia/authelia:4.37.5
+    image: authelia/authelia:4.38.8
     container_name: authelia
     hostname: authelia
     restart: unless-stopped
     environment:
-      - AUTHELIA_JWT_SECRET_FILE=/config/secrets/jwt
+      - AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE=/config/secrets/jwt
       - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE=/config/secrets/encryption_key
       - TZ=$TZ
     volumes:
@@ -21,7 +21,7 @@ services:
       - "traefik.http.routers.authelia.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.authelia.tls.certresolver=letsencrypt"
       # --- Authelia Middleware ---
-      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://$DOMAIN_NAME/"
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth"
       - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
       - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 
