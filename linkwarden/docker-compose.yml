@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  linkwarden_db:
+    image: postgres:16.2
+    container_name: linkwarden_db
+    hostname: linkwarden_db
+    restart: unless-stopped
+    volumes:
+      - $DOCKER_DATA/linkwarden/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$POSTGRES_DATABASE
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - linkwarden
+
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:latest
+    container_name: linkwarden
+    hostname: linkwarden
+    restart: unless-stopped
+    depends_on:
+      - linkwarden_db
+    environment:
+      - NEXTAUTH_URL=https://$DOMAIN_NAME/api/v1/auth
+      - NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@linkwarden_db/$POSTGRES_DATABASE
+    volumes:
+      - $DOCKER_DATA/linkwarden/data:/data/data
+    networks:
+      - default
+      - linkwarden
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.linkwarden.loadbalancer.server.port=3000"
+      - "traefik.http.routers.linkwarden.entrypoints=websecure"
+      - "traefik.http.routers.linkwarden.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.linkwarden.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.linkwarden.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  linkwarden:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
