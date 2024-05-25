@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  jellystat_db:
+    image: postgres:15.1
+    container_name: jellystat_db
+    hostname: jellystat_db
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 10s
+      start_period: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - $DOCKER_DATA/jellystat/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=jfstat
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - jellystat
+
+  jellystat:
+    image: cyfershepard/jellystat:latest
+    container_name: jellystat
+    hostname: jellystat
+    restart: unless-stopped
+    depends_on:
+      - jellystat_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_IP=jellystat_db
+      - POSTGRES_PORT=5432
+      - JWT_SECRET=$JWT_SECRET
+      - TZ=$TZ
+    volumes:
+      - $DOCKER_DATA/jellystat/data:/app/backend/backup-data
+    networks:
+      - default
+      - jellystat
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.jellystat.loadbalancer.server.port=3000"
+      - "traefik.http.routers.jellystat.entrypoints=websecure"
+      - "traefik.http.routers.jellystat.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.jellystat.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.jellystat.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  jellystat:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
