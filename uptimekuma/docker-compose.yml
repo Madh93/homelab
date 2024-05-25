@@ -12,13 +12,14 @@ services:
       - TZ=$TZ
     volumes:
       - $DOCKER_DATA/uptimekuma/data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Docker monitoring
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.uptimekuma.loadbalancer.server.port=3001"
       - "traefik.http.routers.uptimekuma.entrypoints=websecure"
       - "traefik.http.routers.uptimekuma.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.uptimekuma.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.uptimekuma.middlewares=authelia,lan-only,security-headers"
+      - "traefik.http.routers.uptimekuma.middlewares=authelia,error-pages,lan-only,security-headers"
 
 networks:
   default:
