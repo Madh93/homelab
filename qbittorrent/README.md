@@ -5,6 +5,7 @@
 - [Configuration](#configuration)
   * [OpenVPN client setup](#openvpn-client-setup)
   * [Docker setup](#docker-setup)
+  * [Avoid IP Leak](#avoid-ip-leak)
   * [Authelia setup](#authelia-setup)
 - [Useful links](#useful-links)
 
@@ -72,6 +73,12 @@ xxx.xxx.xxx.xxx # Should be your public IP
 user@host:~$ docker exec -it qbittorrent curl ifconfig.me
 xxx.xxx.xxx.xxx # Should be the VPN provider IP
 ```
+
+### Avoid IP Leak
+
+To ensure qBittorrent does not leak our real IP address, configure it to use only the VPN interface (by default, it uses all available interfaces, more info [here](https://www.reddit.com/r/qBittorrent/comments/14bzdct/psa_qbittorrent_leaks_your_real_ip_when_using_vpn/)). Go to: Options -> Advanced -> Network Interface -> Select the VPN interface (`tun0`).
+
+![qBittorrent settings](docs/img/qbittorrent.png)
 
 ### Authelia setup
 

@@ -44,7 +44,7 @@ services:
       - "traefik.http.routers.qbittorrent.entrypoints=websecure"
       - "traefik.http.routers.qbittorrent.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.qbittorrent.middlewares=authelia,lan-only,security-headers"
+      - "traefik.http.routers.qbittorrent.middlewares=authelia,error-pages,lan-only,security-headers"
 
 networks:
   default:
