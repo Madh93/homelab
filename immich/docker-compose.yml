@@ -9,7 +9,6 @@ services:
     depends_on:
       - immich_redis
       - immich_db
-    command: [ "start.sh", "immich" ]
     volumes:
       - $UPLOAD_LOCATION:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -19,6 +18,7 @@ services:
       - DB_DATABASE_NAME=$POSTGRES_DB
       - DB_USERNAME=$POSTGRES_USER
       - DB_PASSWORD=$POSTGRES_PASSWORD
+      - REDIS_HOSTNAME=immich_redis
     networks:
       - default
       - immich
@@ -29,27 +29,6 @@ services:
       - "traefik.http.routers.immich.rule=Host(`$DOMAIN_NAME`)"
       - "traefik.http.routers.immich.tls.certresolver=letsencrypt"
       - "traefik.http.routers.immich.middlewares=authelia,error-pages,lan-only,security-headers"
-
-  immich_microservices:
-    image: ghcr.io/immich-app/immich-server:$IMMICH_VERSION
-    container_name: immich_microservices
-    hostname: immich-microservices
-    restart: unless-stopped
-    depends_on:
-      - immich_redis
-      - immich_db
-    command: [ "start.sh", "microservices" ]
-    volumes:
-      - $UPLOAD_LOCATION:/usr/src/app/upload
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - JWT_SECRET=$JWT_SECRET
-      - DB_HOSTNAME=immich_db
-      - DB_DATABASE_NAME=$POSTGRES_DB
-      - DB_USERNAME=$POSTGRES_USER
-      - DB_PASSWORD=$POSTGRES_PASSWORD
-    networks:
-      - immich
 
   immich_machine_learning:
     # image: ghcr.io/immich-app/immich-machine-learning:$IMMICH_VERSION
@@ -71,6 +50,8 @@ services:
     container_name: immich_redis
     hostname: immich_redis
     restart: unless-stopped
+    healthcheck:
+      test: redis-cli ping || exit 1
     networks:
       - immich
 
@@ -79,12 +60,19 @@ services:
     container_name: immich_db
     hostname: immich_db
     restart: unless-stopped
+    command: ["postgres", "-c" ,"shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
+    healthcheck:
+      test: pg_isready --dbname='${POSTGRES_DB}' --username='${POSTGRES_USER}' || exit 1; Chksum="$$(psql --dbname='${POSTGRES_DB}' --username='${POSTGRES_USER}' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+      interval: 1m
+      start_period: 10s
+      retries: 3
     volumes:
       - $DOCKER_DATA/immich/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_INITDB_ARGS="--data-checksums"
     networks:
       - immich
 
