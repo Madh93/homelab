@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    hostname: openwebui
+    restart: unless-stopped
+    # user: $PUID:$PGID
+    environment:
+      - WEBUI_AUTH=false # Disable authentication
+      - WEBUI_SECRET_KEY=$WEBUI_SECRET_KEY
+      - OLLAMA_BASE_URL=$OLLAMA_BASE_URL
+    volumes:
+      - $DOCKER_DATA/openwebui/data:/app/backend/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
+      - "traefik.http.routers.openwebui.entrypoints=websecure"
+      - "traefik.http.routers.openwebui.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.openwebui.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.openwebui.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
