@@ -1,11 +1,12 @@
-version: "3.9"
-
 services:
   traefik:
-    image: traefik:2.11.2
+    image: traefik:3.1.2
     container_name: traefik
     hostname: traefik
     restart: unless-stopped
+    depends_on:
+      errorpages:
+        condition: service_healthy
     environment:
       - CF_DNS_API_TOKEN=$CF_DNS_API_TOKEN
     ports:
@@ -49,12 +50,15 @@ services:
       - "--ping.entryPoint=internal"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.rule=Host(`$DOMAIN_NAME`)"
-      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.middlewares=dashboard-auth,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      # Wildcard certificate
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.traefik.tls.domains[0].sans=*.$DOMAIN_NAME"
       # --- Middlewares ---
+      - "traefik.http.routers.traefik.middlewares=dashboard-auth,error-pages,lan-only,security-headers"
       # Basic auth
       - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
       # IP Whitelist (LAN Only)
@@ -77,21 +81,18 @@ services:
       - host.docker.internal:172.17.0.1 # https://doc.traefik.io/traefik/providers/docker/#host-networking
 
   errorpages:
-    image: tarampampam/error-pages:latest
+    image: ghcr.io/tarampampam/error-pages:latest
     container_name: errorpages
     hostname: errorpages
     restart: unless-stopped
-    depends_on:
-      - traefik
     environment:
       - TEMPLATE_NAME=$ERROR_PAGES_TEMPLATE
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.errorpages.loadbalancer.server.port=8080"
       - "traefik.http.routers.errorpages.entrypoints=websecure"
-      - "traefik.http.routers.errorpages.tls.certresolver=letsencrypt"
       # Fallback for any NON-registered services
-      - "traefik.http.routers.errorpages.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.errorpages.rule=HostRegexp(`.+`)"
       - "traefik.http.routers.errorpages.priority=10"
       - "traefik.http.routers.errorpages.middlewares=error-pages"
       # --- Error Pages Middleware ---

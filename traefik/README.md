@@ -166,9 +166,8 @@ errorpages:
     - "traefik.enable=true"
     - "traefik.http.services.errorpages.loadbalancer.server.port=8080"
     - "traefik.http.routers.errorpages.entrypoints=websecure"
-    - "traefik.http.routers.errorpages.tls.certresolver=letsencrypt"
     # Fallback for any NON-registered services
-    - "traefik.http.routers.errorpages.rule=HostRegexp(`{host:.+}`)"
+    - "traefik.http.routers.errorpages.rule=HostRegexp(`.+`)"
     - "traefik.http.routers.errorpages.priority=10"
     - "traefik.http.routers.errorpages.middlewares=error-pages"
     # --- Error Pages Middleware ---
@@ -195,7 +194,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="traefik.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="traefik"
 LETS_ENCRYPT_EMAIL="alice@example.org"
 CF_DNS_API_TOKEN="supersecret"
 HOME_SUBNET="192.168.0.0/24"
