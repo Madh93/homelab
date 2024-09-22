@@ -1,0 +1,100 @@
+services:
+  authentik_redis:
+    image: redis:7.4
+    container_name: authentik_redis
+    hostname: authentik_redis
+    restart: unless-stopped
+    command: --save 60 1 --loglevel warning
+    healthcheck:
+      test: redis-cli ping || exit 1
+    volumes:
+      - $DOCKER_DATA/authentik/redis:/data
+    networks:
+      - authentik
+
+  authentik_db:
+    image: postgres:16.4
+    container_name: authentik_db
+    hostname: authentik_db
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready -d $POSTGRES_DATABASE -U $POSTGRES_USER
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - $DOCKER_DATA/authentik/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=$POSTGRES_DATABASE
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    networks:
+      - authentik
+
+  authentik_server:
+    image: ghcr.io/goauthentik/server:$AUTHENTIK_VERSION
+    container_name: authentik_server
+    hostname: authentik_server
+    command: server
+    restart: unless-stopped
+    depends_on:
+      - authentik_db
+      - authentik_redis
+    environment:
+      AUTHENTIK_SECRET_KEY: $AUTHENTIK_SECRET_KEY
+      AUTHENTIK_REDIS__HOST: authentik_redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik_db
+      AUTHENTIK_POSTGRESQL__NAME: $POSTGRES_DATABASE
+      AUTHENTIK_POSTGRESQL__USER: $POSTGRES_USER
+      AUTHENTIK_POSTGRESQL__PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - $DOCKER_DATA/authentik/media:/media
+      - $DOCKER_DATA/authentik/custom-templates:/templates
+    networks:
+      - default
+      - authentik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+      - "traefik.http.routers.authentik.entrypoints=websecure"
+      - "traefik.http.routers.authentik.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.authentik.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.authentik.tls.domains[0].sans=*.$DOMAIN_NAME"
+      - "traefik.http.routers.authentik.tls.certresolver=letsencrypt"
+      # --- Authentik Middleware ---
+      - "traefik.http.middlewares.authentik.forwardauth.address=http://authentik_server:9000/outpost.goauthentik.io/auth/traefik"
+      - "traefik.http.middlewares.authentik.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authentik.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version"
+
+  authentik_worker:
+    image: ghcr.io/goauthentik/server:$AUTHENTIK_VERSION
+    container_name: authentik_worker
+    hostname: authentik_worker
+    command: worker
+    user: root
+    restart: unless-stopped
+    depends_on:
+      - authentik_db
+      - authentik_redis
+    environment:
+      AUTHENTIK_SECRET_KEY: $AUTHENTIK_SECRET_KEY
+      AUTHENTIK_REDIS__HOST: authentik_redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik_db
+      AUTHENTIK_POSTGRESQL__NAME: $POSTGRES_DATABASE
+      AUTHENTIK_POSTGRESQL__USER: $POSTGRES_USER
+      AUTHENTIK_POSTGRESQL__PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $DOCKER_DATA/authentik/media:/media
+      - $DOCKER_DATA/authentik/custom-templates:/templates
+      - $DOCKER_DATA/authentik/certs:/certs
+    networks:
+      - default
+      - authentik
+
+networks:
+  authentik:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
