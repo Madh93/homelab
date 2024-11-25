@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   immich_server:
     image: ghcr.io/immich-app/immich-server:$IMMICH_VERSION
@@ -24,15 +22,17 @@ services:
       - immich
     labels:
       - "traefik.enable=true"
-      - "traefik.http.services.immich.loadbalancer.server.port=3001"
+      - "traefik.http.services.immich.loadbalancer.server.port=2283"
       - "traefik.http.routers.immich.entrypoints=websecure"
-      - "traefik.http.routers.immich.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.immich.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.immich.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.immich.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.immich.tls.certresolver=letsencrypt"
       - "traefik.http.routers.immich.middlewares=authelia,error-pages,lan-only,security-headers"
 
   immich_machine_learning:
-    # image: ghcr.io/immich-app/immich-machine-learning:$IMMICH_VERSION
-    image: my-immich-machine-learning:$IMMICH_VERSION # TODO: https://github.com/immich-app/immich/discussions/300
+    image: ghcr.io/immich-app/immich-machine-learning:$IMMICH_VERSION
+    # image: my-immich-machine-learning:$IMMICH_VERSION # TODO: https://github.com/immich-app/immich/discussions/300
     container_name: immich_machine_learning
     hostname: immich-machine-learning
     restart: unless-stopped
