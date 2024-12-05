@@ -1,0 +1,34 @@
+services:
+  cloudflare_ddns_proxied:
+    image: favonia/cloudflare-ddns:latest
+    container_name: cloudflare_ddns_proxied
+    hostname: cloudflare_ddns_proxied    
+    restart: unless-stopped
+    user: $PUID:$PGID
+    read_only: true
+    cap_drop: [all]
+    security_opt: [no-new-privileges:true]
+    environment:
+      - CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN
+      - DOMAINS=$PROXIED_DOMAINS
+      - PROXIED=true
+      - IP6_PROVIDER=none
+  cloudflare_ddns_not_proxied:
+    image: favonia/cloudflare-ddns:latest
+    container_name: cloudflare_ddns_not_proxied
+    hostname: cloudflare_ddns_not_proxied    
+    restart: unless-stopped
+    user: $PUID:$PGID
+    read_only: true
+    cap_drop: [all]
+    security_opt: [no-new-privileges:true]
+    environment:
+      - CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN
+      - DOMAINS=$NOT_PROXIED_DOMAINS
+      - PROXIED=false
+      - IP6_PROVIDER=none
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
