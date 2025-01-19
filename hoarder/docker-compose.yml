@@ -1,0 +1,65 @@
+services:
+  hoarder_chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    container_name: hoarder_chrome
+    hostname: hoarder_chrome
+    restart: unless-stopped
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+    networks:
+      - hoarder
+
+  hoarder_meilisearch:
+    image: getmeili/meilisearch:v1.11.1
+    container_name: hoarder_meilisearch
+    hostname: hoarder_meilisearch
+    restart: unless-stopped
+    volumes:
+      - $DOCKER_DATA/hoarder/meilisearch:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=$MEILI_MASTER_KEY
+      - MEILI_NO_ANALYTICS=true
+    networks:
+      - hoarder
+
+  hoarder:
+    image: ghcr.io/hoarder-app/hoarder:0.21.0
+    container_name: hoarder
+    hostname: hoarder
+    restart: unless-stopped
+    depends_on:
+      - hoarder_chrome
+      - hoarder_meilisearch
+    environment:
+      - DATA_DIR=/data
+      - NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+      - NEXTAUTH_URL=https://$SUBDOMAIN.$DOMAIN_NAME
+      - MEILI_ADDR=http://hoarder_meilisearch:7700
+      - MEILI_MASTER_KEY=$MEILI_MASTER_KEY
+      - BROWSER_WEB_URL=http://hoarder_chrome:9222
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    volumes:
+      - $DOCKER_DATA/hoarder/data:/data
+    networks:
+      - default
+      - hoarder
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.hoarder.loadbalancer.server.port=3000"
+      - "traefik.http.routers.hoarder.entrypoints=websecure"
+      - "traefik.http.routers.hoarder.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.hoarder.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.hoarder.tls.domains[0].sans=*.$DOMAIN_NAME"
+      - "traefik.http.routers.hoarder.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.hoarder.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  hoarder:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
