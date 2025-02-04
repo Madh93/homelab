@@ -28,7 +28,7 @@ services:
       - hoarder
 
   hoarder:
-    image: ghcr.io/hoarder-app/hoarder:0.21.0
+    image: ghcr.io/hoarder-app/hoarder:0.22.0
     container_name: hoarder
     hostname: hoarder
     restart: unless-stopped
