@@ -1,0 +1,12 @@
+services:
+  hoarderbot:
+    image: ghcr.io/madh93/hoarderbot:latest
+    container_name: hoarderbot
+    hostname: hoarderbot
+    restart: unless-stopped
+    env_file: '.env'
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
