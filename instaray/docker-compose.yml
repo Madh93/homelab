@@ -1,0 +1,12 @@
+services:
+  instaray:
+    image: ghcr.io/madh93/instaray:latest
+    container_name: instaray
+    hostname: instaray
+    restart: unless-stopped
+    env_file: '.env'
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
