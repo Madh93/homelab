@@ -19,7 +19,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="miniflux.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="miniflux"
 POSTGRES_DATABASE="miniflux"
 POSTGRES_USER="miniflux"
 POSTGRES_PASSWORD="supersecret"
