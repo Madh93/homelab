@@ -46,7 +46,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false" # Disable Watchtower
 
   immich_redis:
-    image: redis:6.2
+    image: valkey/valkey:8-bookworm
     container_name: immich_redis
     hostname: immich_redis
     restart: unless-stopped
@@ -56,16 +56,10 @@ services:
       - immich
 
   immich_db:
-    image: tensorchord/pgvecto-rs:pg15-v0.2.0
+    image: ghcr.io/immich-app/postgres:15-vectorchord0.3.0-pgvectors0.2.0
     container_name: immich_db
     hostname: immich_db
     restart: unless-stopped
-    command: ["postgres", "-c" ,"shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
-    healthcheck:
-      test: pg_isready --dbname='${POSTGRES_DB}' --username='${POSTGRES_USER}' || exit 1; Chksum="$$(psql --dbname='${POSTGRES_DB}' --username='${POSTGRES_USER}' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
-      interval: 1m
-      start_period: 10s
-      retries: 3
     volumes:
       - $DOCKER_DATA/immich/postgres:/var/lib/postgresql/data
     environment:
