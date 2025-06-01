@@ -1,8 +1,8 @@
 services:
-  hoarderbot:
-    image: ghcr.io/madh93/hoarderbot:latest
-    container_name: hoarderbot
-    hostname: hoarderbot
+  karakeepbot:
+    image: ghcr.io/madh93/karakeepbot:latest
+    container_name: karakeepbot
+    hostname: karakeepbot
     restart: unless-stopped
     env_file: '.env'
 
