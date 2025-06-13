@@ -28,7 +28,7 @@ services:
       - karakeep
 
   karakeep:
-    image: ghcr.io/karakeep-app/karakeep:0.24.1
+    image: ghcr.io/karakeep-app/karakeep:0.25.0
     container_name: karakeep
     hostname: karakeep
     restart: unless-stopped
