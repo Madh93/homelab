@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   joplin_db:
     image: postgres:15.1
@@ -16,7 +14,7 @@ services:
       - joplin
 
   joplin:
-    image: joplin/server:2.14.2-beta
+    image: joplin/server:3.4.1
     container_name: joplin
     hostname: joplin
     restart: unless-stopped
@@ -24,7 +22,7 @@ services:
       - joplin_db
     environment:
       - APP_PORT=22300
-      - APP_BASE_URL=https://$DOMAIN_NAME
+      - APP_BASE_URL=https://$SUBDOMAIN.$DOMAIN_NAME
       - DB_CLIENT=pg
       - POSTGRES_HOST=joplin_db
       - POSTGRES_PORT=5432
@@ -38,7 +36,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.joplin.loadbalancer.server.port=22300"
       - "traefik.http.routers.joplin.entrypoints=websecure"
-      - "traefik.http.routers.joplin.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.joplin.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.joplin.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.joplin.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.joplin.tls.certresolver=letsencrypt"
       - "traefik.http.routers.joplin.middlewares=error-pages,lan-only,security-headers"
 

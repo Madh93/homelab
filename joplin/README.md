@@ -26,7 +26,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="joplin.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="joplin"
 POSTGRES_DATABASE="joplin"
 POSTGRES_USER="joplin"
 POSTGRES_PASSWORD="supersecret"
