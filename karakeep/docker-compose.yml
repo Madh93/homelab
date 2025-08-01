@@ -28,7 +28,7 @@ services:
       - karakeep
 
   karakeep:
-    image: ghcr.io/karakeep-app/karakeep:0.25.0
+    image: ghcr.io/karakeep-app/karakeep:0.26.0
     container_name: karakeep
     hostname: karakeep
     restart: unless-stopped
@@ -44,9 +44,9 @@ services:
       - BROWSER_WEB_URL=http://karakeep_chrome:9222
       - OPENAI_API_KEY=$OPENAI_API_KEY
       # Configuring different AI Providers: https://docs.karakeep.app/Guides/different-ai-providers/
-      - OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta
-      - INFERENCE_TEXT_MODEL=gemini-2.0-flash
-      - INFERENCE_IMAGE_MODEL=gemini-2.0-flash
+      # - OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta
+      # - INFERENCE_TEXT_MODEL=gemini-2.0-flash
+      # - INFERENCE_IMAGE_MODEL=gemini-2.0-flash
     volumes:
       - $DOCKER_DATA/karakeep/data:/data
     networks:
