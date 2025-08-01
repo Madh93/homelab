@@ -1,0 +1,34 @@
+services:
+  pocketid:
+    image: ghcr.io/pocket-id/pocket-id:v1.6.4
+    container_name: pocketid
+    hostname: pocketid
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "/app/pocket-id", "healthcheck" ]
+      interval: 1m30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s    
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - APP_URL=https://$SUBDOMAIN.$DOMAIN_NAME
+      - TRUST_PROXY=true
+    volumes:
+      - $DOCKER_DATA/pocketid/data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.pocketid.loadbalancer.server.port=1411"
+      - "traefik.http.routers.pocketid.entrypoints=websecure"
+      - "traefik.http.routers.pocketid.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.pocketid.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.pocketid.tls.domains[0].sans=*.$DOMAIN_NAME"
+      - "traefik.http.routers.pocketid.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.pocketid.middlewares=security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
