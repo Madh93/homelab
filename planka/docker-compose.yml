@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   planka_db:
     image: postgres:15.1
@@ -30,17 +28,20 @@ services:
           echo \"Tried $$i times. Waiting 5 seconds...\";
           sleep 5;
         done; (exit $$s)"
-    ports:
-      - 3000:1337
+    user: $PUID:$PGID
     environment:
-      - BASE_URL=https://$DOMAIN_NAME
-      - TRUST_PROXY=0
+      - BASE_URL=https://$SUBDOMAIN.$DOMAIN_NAME
+      - TRUST_PROXY=1
       - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@planka_db/$POSTGRES_DATABASE
       - SECRET_KEY=$SECRET_KEY
+      - OIDC_ISSUER=$OIDC_ISSUER
+      - OIDC_CLIENT_ID=$OIDC_CLIENT_ID
+      - OIDC_CLIENT_SECRET=$OIDC_CLIENT_SECRET
     volumes:
       - $DOCKER_DATA/planka/data/user-avatars:/app/public/user-avatars
       - $DOCKER_DATA/planka/data/project-background-images:/app/public/project-background-images
       - $DOCKER_DATA/planka/data/attachments:/app/private/attachments
+      - $DOCKER_DATA/planka/data/logs:/app/logs
     networks:
       - default
       - planka
@@ -48,9 +49,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.planka.loadbalancer.server.port=1337"
       - "traefik.http.routers.planka.entrypoints=websecure"
-      - "traefik.http.routers.planka.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.planka.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.planka.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.planka.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.planka.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.planka.middlewares=authelia,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.planka.middlewares=error-pages,lan-only,security-headers"
 
 networks:
   planka:
