@@ -6,6 +6,7 @@
   * [DNS setup](#dns-setup)
   * [Lets Encrypt](#lets-encrypt)
   * [Dashboard auth](#dashboard-auth)
+  * [OIDC Authentication](#oidc-authentication)
   * [IP Whitelist](#ip-whitelist)
   * [Log rotating](#log-rotating)
   * [Error pages](#error-pages)
@@ -91,6 +92,44 @@ volumes:
 labels:
   - "traefik.http.routers.traefik.middlewares=dashboard-auth"
   - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
+```
+
+### OIDC Authentication
+
+For a more robust and centralized Single Sign-On (SSO) experience, we can delegate authentication to an OIDC identity provider (e.g., [Pocket ID](https://pocket-id.org/)) using the [traefik-oidc-auth](https://traefik-oidc-auth.sevensolutions.cc/) plugin.
+
+The plugin is enabled via static configuration arguments in the `command` section:
+
+```yaml
+command:
+  # OIDC Authentication Plugin
+  - "--experimental.plugins.traefik-oidc-auth.modulename=github.com/sevensolutions/traefik-oidc-auth"
+  - "--experimental.plugins.traefik-oidc-auth.version=v0.13.0"
+```
+
+The middleware itself and the required callback router are configured via labels on the Traefik container. This creates a single, reusable `oidc-auth` middleware.
+
+```yaml
+labels:
+  # OIDC Authentication Middleware Definition
+  - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.secret=${OIDC_SECRET}"
+  - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.url=https://${OIDC_SUBDOMAIN}.${DOMAIN_NAME}/"
+  - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.clientId=${OIDC_CLIENT_ID}"
+  - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.clientSecret=${OIDC_CLIENT_SECRET}"
+  - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.scopes=${OIDC_SCOPES}"
+  # OIDC Callback Router (handles redirect from the OIDC provider)
+  - "traefik.http.routers.traefik-callback.entrypoints=websecure"
+  - "traefik.http.routers.traefik-callback.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`) && (PathPrefix(`/oidc/callback`) || PathPrefix(`/logout`))"
+  - "traefik.http.routers.traefik-callback.middlewares=oidc-auth"
+  - "traefik.http.routers.traefik-callback.service=noop@internal"
+```
+
+To protect any service, add the `oidc-auth` middleware to its router. This example shows how to secure the Traefik dashboard, replacing the previous `BasicAuth` method.
+
+```yaml
+labels:
+  # Apply the OIDC middleware to the Traefik dashboard router
+  - "traefik.http.routers.traefik.middlewares=oidc-auth,error-pages,lan-only,security-headers"
 ```
 
 ### IP Whitelist
@@ -200,6 +239,11 @@ LETS_ENCRYPT_EMAIL="alice@example.org"
 CF_DNS_API_TOKEN="supersecret"
 HOME_SUBNET="192.168.0.0/24"
 ERROR_PAGES_TEMPLATE="connection"
+OIDC_SECRET="supersecret"
+OIDC_SUBDOMAIN="pocketid"
+OIDC_CLIENT_ID="supersecret"
+OIDC_CLIENT_SECRET="supersecret"
+OIDC_SCOPES="openid,profile,email,groups"
 ```
 
 And deploy:
@@ -221,3 +265,4 @@ And deploy:
 - [Let's Encrypt Challenge Types](https://letsencrypt.org/docs/challenge-types/)
 - [Traefik with Error Pages](https://github.com/tarampampam/error-pages/wiki/Traefik-(docker-compose))
 - [Rotating Traefik logs with logrotate](https://geekland.eu/configurar-la-rotacion-de-logs-en-traefik-con-logrotate/)
+- [Traefik OIDC Authentication Plugin](https://traefik-oidc-auth.sevensolutions.cc/docs/getting-started)

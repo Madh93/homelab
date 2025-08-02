@@ -48,6 +48,9 @@ services:
       # Ping
       - "--ping=true"
       - "--ping.entryPoint=internal"
+      # OIDC Authentication Plugin
+      - "--experimental.plugins.traefik-oidc-auth.modulename=github.com/sevensolutions/traefik-oidc-auth"
+      - "--experimental.plugins.traefik-oidc-auth.version=v0.13.0"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.service=api@internal"
@@ -57,10 +60,19 @@ services:
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.routers.traefik.tls.domains[0].main=$DOMAIN_NAME"
       - "traefik.http.routers.traefik.tls.domains[0].sans=*.$DOMAIN_NAME"
+      # OIDC Callback Router (handles redirect from the OIDC provider)
+      - traefik.http.routers.traefik-callback.entrypoints=websecure
+      - traefik.http.routers.traefik-callback.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`) && (PathPrefix(`/oidc/callback`) || PathPrefix(`/logout`))
+      - traefik.http.routers.traefik-callback.middlewares=oidc-auth
+      - traefik.http.routers.traefik-callback.service=noop@internal
       # --- Middlewares ---
-      - "traefik.http.routers.traefik.middlewares=dashboard-auth,error-pages,lan-only,security-headers"
-      # Basic auth
-      - "traefik.http.middlewares.dashboard-auth.basicauth.usersfile=/credentials/traefik"
+      - "traefik.http.routers.traefik.middlewares=oidc-auth,error-pages,lan-only,security-headers"
+      # OIDC Authentication
+      - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.secret=${OIDC_SECRET}"
+      - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.url=https://${OIDC_SUBDOMAIN}.${DOMAIN_NAME}/"
+      - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.clientId=${OIDC_CLIENT_ID}"
+      - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.clientSecret=${OIDC_CLIENT_SECRET}"
+      - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.scopes=${OIDC_SCOPES}"
       # IP Whitelist (LAN Only)
       - "traefik.http.middlewares.lan-only.ipallowlist.sourceRange=$HOME_SUBNET"
       # Security Headers: HTTP Strict Transport Security (HSTS)
