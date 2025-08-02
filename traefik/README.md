@@ -7,6 +7,7 @@
   * [Lets Encrypt](#lets-encrypt)
   * [Dashboard auth](#dashboard-auth)
   * [OIDC Authentication](#oidc-authentication)
+  * [Handling Origin IPs from Cloudflare](#handling-origin-ips-from-cloudflare)
   * [IP Whitelist](#ip-whitelist)
   * [Log rotating](#log-rotating)
   * [Error pages](#error-pages)
@@ -132,6 +133,19 @@ labels:
   - "traefik.http.routers.traefik.middlewares=oidc-auth,error-pages,lan-only,security-headers"
 ```
 
+### Handling Origin IPs from Cloudflare
+
+When you use Cloudflare's proxy (orange cloud), all traffic reaching your server comes from [Cloudflare's IP addresses](https://www.cloudflare.com/ips/). This means tools like `Fail2ban` or your application logs will see Cloudflare's IP, not the actual visitor's IP.
+
+To fix this, we must configure Traefik to trust Cloudflare and look for the real IP in the `CF-Connecting-IP` HTTP header:
+
+```yaml
+command:
+  # Cloudflare Forwarder Headers
+  - "--entrypoints.web.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
+  - "--entrypoints.websecure.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
+```
+
 ### IP Whitelist
 
 We can limit the Traefik API built-in dashboard (and others services too) to
@@ -237,6 +251,8 @@ DOMAIN_NAME="domain.tld"
 SUBDOMAIN="traefik"
 LETS_ENCRYPT_EMAIL="alice@example.org"
 CF_DNS_API_TOKEN="supersecret"
+CF_IPS_V4="173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22"
+CF_IPS_V6="2400:cb00::/32,2606:4700::/32,2803:f800::/32,2405:b500::/32,2405:8100::/32,2a06:98c0::/29,2c0f:f248::/32"
 HOME_SUBNET="192.168.0.0/24"
 ERROR_PAGES_TEMPLATE="connection"
 OIDC_SECRET="supersecret"

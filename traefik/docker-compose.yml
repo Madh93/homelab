@@ -31,6 +31,9 @@ services:
       # HTTPS redirection
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      # Cloudflare Forwarder Headers
+      - "--entrypoints.web.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
+      - "--entrypoints.websecure.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
       # Let's Encrypt
       - "--certificatesResolvers.letsencrypt.acme.email=$LETS_ENCRYPT_EMAIL"
       - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
