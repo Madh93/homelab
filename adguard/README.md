@@ -25,7 +25,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="adguard.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="adguard"
 ```
 
 And deploy:

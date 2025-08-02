@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   syncthing:
     image: lscr.io/linuxserver/syncthing:latest
@@ -21,9 +19,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
       - "traefik.http.routers.syncthing.entrypoints=websecure"
-      - "traefik.http.routers.syncthing.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.syncthing.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.syncthing.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.syncthing.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.syncthing.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.syncthing.middlewares=authelia,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.syncthing.middlewares=oidc-auth,error-pages,lan-only,security-headers"
     # network_mode: host # Required for Discovery!
 
 networks:

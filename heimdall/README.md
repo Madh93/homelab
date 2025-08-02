@@ -22,7 +22,8 @@ We create a `.env` file:
 DOCKER_DATA="/docker/data"
 DOWNLOADS_DATA="/downloads"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="heimdall.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="heimdall"
 PUID=1000
 PGID=1000
 TZ="Europe/Madrid"

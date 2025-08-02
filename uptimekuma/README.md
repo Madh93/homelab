@@ -18,7 +18,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="uptime.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="uptimekuma"
 PUID=1000
 PGID=1000
 TZ="Europe/Madrid"

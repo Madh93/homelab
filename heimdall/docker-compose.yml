@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   heimdall:
     image: lscr.io/linuxserver/heimdall:latest
@@ -16,9 +14,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.heimdall.loadbalancer.server.port=80"
       - "traefik.http.routers.heimdall.entrypoints=websecure"
-      - "traefik.http.routers.heimdall.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.heimdall.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.heimdall.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.heimdall.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.heimdall.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.heimdall.middlewares=authelia,lan-only,security-headers"
+      - "traefik.http.routers.heimdall.middlewares=oidc-auth,lan-only,security-headers"
 
 networks:
   default:

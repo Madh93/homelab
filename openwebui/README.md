@@ -25,7 +25,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="openwebui.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="openwebui"
 WEBUI_SECRET_KEY="supersecret"
 OLLAMA_BASE_URL="http://localhost:11434"
 ```

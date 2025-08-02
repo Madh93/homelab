@@ -39,7 +39,8 @@ We create a `.env` file:
 DOCKER_DATA="/docker/data"
 DOWNLOADS_DATA="/downloads"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="metube.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="metube"
 PUID=1000
 PGID=1000
 TZ="Europe/Madrid"

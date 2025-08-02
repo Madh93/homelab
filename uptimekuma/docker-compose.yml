@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   uptimekuma:
     image: louislam/uptime-kuma:latest
@@ -17,9 +15,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.uptimekuma.loadbalancer.server.port=3001"
       - "traefik.http.routers.uptimekuma.entrypoints=websecure"
-      - "traefik.http.routers.uptimekuma.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.uptimekuma.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.uptimekuma.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.uptimekuma.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.uptimekuma.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.uptimekuma.middlewares=authelia,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.uptimekuma.middlewares=oidc-auth,error-pages,lan-only,security-headers"
 
 networks:
   default:

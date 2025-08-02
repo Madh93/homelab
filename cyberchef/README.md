@@ -22,7 +22,8 @@ We create a `.env` file:
 
 ```shell
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="cyberchef.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="cyberchef"
 TZ="Europe/Madrid"
 ```
 

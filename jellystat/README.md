@@ -25,7 +25,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="jellystat.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="jellystat"
 POSTGRES_PASSWORD="supersecret"
 JWT_SECRET="supersecret"
 TZ="Europe/Madrid"

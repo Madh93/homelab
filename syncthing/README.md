@@ -32,7 +32,8 @@ We create a `.env` file:
 DOCKER_DATA="/docker/data"
 SYNC_DATA="/sync"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="syncthing.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="syncthing"
 PUID=1000
 PGID=1000
 TZ="Europe/Madrid"

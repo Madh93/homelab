@@ -1,12 +1,9 @@
-version: "3.9"
-
 services:
   openwebui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:latest
     container_name: openwebui
     hostname: openwebui
     restart: unless-stopped
-    # user: $PUID:$PGID
     environment:
       - WEBUI_AUTH=false # Disable authentication
       - WEBUI_SECRET_KEY=$WEBUI_SECRET_KEY
@@ -17,9 +14,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.openwebui.loadbalancer.server.port=8080"
       - "traefik.http.routers.openwebui.entrypoints=websecure"
-      - "traefik.http.routers.openwebui.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.openwebui.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.openwebui.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.openwebui.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.openwebui.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.openwebui.middlewares=authelia,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.openwebui.middlewares=oidc-auth,error-pages,lan-only,security-headers"
 
 networks:
   default:

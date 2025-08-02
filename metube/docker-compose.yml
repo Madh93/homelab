@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   metube:
     image: alexta69/metube:latest
@@ -15,9 +13,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.metube.loadbalancer.server.port=8081"
       - "traefik.http.routers.metube.entrypoints=websecure"
-      - "traefik.http.routers.metube.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.metube.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.metube.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.metube.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.metube.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.metube.middlewares=authelia,lan-only,security-headers"
+      - "traefik.http.routers.metube.middlewares=oidc-auth,error-pages,lan-only,security-headers"
 
 networks:
   default:
