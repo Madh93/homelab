@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   fail2ban:
-    image: crazymax/fail2ban:0.11.2
+    image: crazymax/fail2ban:1.1.0
     container_name: fail2ban
     hostname: fail2ban
     restart: unless-stopped
