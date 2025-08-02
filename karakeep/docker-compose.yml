@@ -42,6 +42,14 @@ services:
       - MEILI_ADDR=http://karakeep_meilisearch:7700
       - MEILI_MASTER_KEY=$MEILI_MASTER_KEY
       - BROWSER_WEB_URL=http://karakeep_chrome:9222
+      # OIDC
+      - OAUTH_PROVIDER_NAME=$OAUTH_PROVIDER_NAME
+      - OAUTH_WELLKNOWN_URL=$OAUTH_WELLKNOWN_URL
+      - OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID
+      - OAUTH_CLIENT_SECRET=$OAUTH_CLIENT_SECRET
+      - DISABLE_PASSWORD_AUTH=true
+      - OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING=true
+      # AI Providers
       - OPENAI_API_KEY=$OPENAI_API_KEY
       # Configuring different AI Providers: https://docs.karakeep.app/Guides/different-ai-providers/
       # - OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta
@@ -60,7 +68,7 @@ services:
       - "traefik.http.routers.karakeep.tls.domains[0].main=$DOMAIN_NAME"
       - "traefik.http.routers.karakeep.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.karakeep.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.karakeep.middlewares=authelia,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.karakeep.middlewares=error-pages,lan-only,security-headers"
 
 networks:
   karakeep:
