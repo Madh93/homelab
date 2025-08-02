@@ -3,10 +3,8 @@
 - [About](#about)
 - [Configuration](#configuration)
   * [Machine Learning requirements](#machine-learning-requirements)
-  * [JWT setup](#jwt-setup)
-  * [Typesense setup](#jwt-setup)
+  * [OIDC setup](#oidc-setup)
   * [Docker setup](#docker-setup)
-  * [Authelia setup](#authelia-setup)
 - [Useful links](#useful-links)
 
 ## About
@@ -22,17 +20,19 @@ The Machine Learning (ML) service requires a CPU with AVX extensions.
 Alternatively, you can build your own ML Docker image to build Tensorflow
 without AVX extensions. More info [here](https://github.com/immich-app/immich/discussions/300).
 
-### JWT setup
+### OIDC setup
 
-Before running Immich it's necessary to define a [JWT secret](https://immich.app/docs/installation/recommended-installation#step-2---populate-the-env-file-with-custom-values) that will must be populated in the `.env` file as `JWT_SECRET` environment variable:
+Immich has built-in support for [OIDC authentication](https://immich.app/docs/administration/oauth), allowing users to log in via an external identity provider like [Pocket ID](https://pocket-id.org/). Before proceeding with the Docker setup, you must create a new OIDC client in your provider.
 
-    openssl rand -base64 128
+When creating the client, you will need to configure the next callback URLs:
 
-### JWT setup
+- `https://<SUBDOMAIN>.<DOMAIN_NAME>/auth/login`
+- `https://<SUBDOMAIN>.<DOMAIN_NAME>/user-settings`
+- `app.immich:///oauth-callback`f
 
-Before running Immich it's necessary to define a [Typesense API Key](https://immich.app/docs/installation/recommended-installation#step-2---populate-the-env-file-with-custom-values) that will must be populated in the `.env` file as `TYPESENSE_API_KEY` environment variable:
+For example, based on the variables in the Docker setup, this would be `https://immich.domain.tld/auth/login`.
 
-    openssl rand -base64 128
+After creating the client, your OIDC provider will give you a **Client ID** and a **Client Secret**. These values, along with your provider's **Issuer URL**, are required to fill the values in Immich -> Administration -> Settings -> Authentication Settings -> OAuth.
 
 ### Docker setup
 
@@ -46,8 +46,6 @@ SUBDOMAIN="immich"
 TZ="Europe/Madrid"
 IMMICH_VERSION="v1.133.1"
 UPLOAD_LOCATION="/media/photos"
-JWT_SECRET="supersecret" 
-TYPESENSE_API_KEY="supersecret"
 POSTGRES_DB="immich"
 POSTGRES_USER="immich"
 POSTGRES_PASSWORD="supersecret"
@@ -57,25 +55,10 @@ And deploy:
 
     docker-compose up -d
 
-### Authelia setup
-
-It's necessary to bypass `/api` if you want to use the mobile app to upload your
-photos.
-
-Add the next rule to the Authelia `configuration.yml`:
-
-```yml
-access_control:
-  default_policy: deny
-  rules:
-    - domain: immich.domain.tld
-      policy: bypass
-      resources:
-        - "^/api.*$"
-```
-
 ## Useful links
 
 - [Immich](https://www.immich.app/)
 - [Immich Docs](https://immich.app/docs/category/getting-started)
 - [Machine Learning on CPUs without AVX](https://github.com/immich-app/immich/discussions/300)
+- [Immich OIDC](https://immich.app/docs/administration/oauth/)
+- [Pocket ID Immich Example](https://pocket-id.org/docs/client-examples/immich)
