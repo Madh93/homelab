@@ -34,6 +34,8 @@ services:
       # Cloudflare Forwarder Headers
       - "--entrypoints.web.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
       - "--entrypoints.websecure.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
+      # Big File Uploads (more info at: https://github.com/immich-app/immich/discussions/8872)
+      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s"
       # Let's Encrypt
       - "--certificatesResolvers.letsencrypt.acme.email=$LETS_ENCRYPT_EMAIL"
       - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
