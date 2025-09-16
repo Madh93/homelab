@@ -1,6 +1,6 @@
 services:
   pocketid:
-    image: ghcr.io/pocket-id/pocket-id:v1.7.0
+    image: ghcr.io/pocket-id/pocket-id:v1.10.0
     container_name: pocketid
     hostname: pocketid
     restart: unless-stopped
