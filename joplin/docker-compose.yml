@@ -14,7 +14,7 @@ services:
       - joplin
 
   joplin:
-    image: joplin/server:3.4.1
+    image: joplin/server:3.4.3
     container_name: joplin
     hostname: joplin
     restart: unless-stopped
@@ -40,7 +40,7 @@ services:
       - "traefik.http.routers.joplin.tls.domains[0].main=$DOMAIN_NAME"
       - "traefik.http.routers.joplin.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.joplin.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.joplin.middlewares=error-pages,lan-only,security-headers"
+      - "traefik.http.routers.joplin.middlewares=lan-only,oidc-auth,error-pages,security-headers"
 
 networks:
   joplin:
