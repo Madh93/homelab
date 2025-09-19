@@ -7,15 +7,20 @@ services:
     hostname: grafana
     restart: unless-stopped
     user: $PUID
+    environment:
+      - GF_SERVER_ROOT_URL=https://$GRAFANA_SUBDOMAIN.$DOMAIN_NAME
+      - GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
     volumes:
       - $DOCKER_DATA/monitoring/grafana:/var/lib/grafana
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
       - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.rule=Host(`$GRAFANA_DOMAIN_NAME`)"
+      - "traefik.http.routers.grafana.rule=Host(`$GRAFANA_SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.grafana.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.grafana.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.grafana.middlewares=authelia,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.grafana.middlewares=error-pages,lan-only,security-headers"
 
   loki:
     image: grafana/loki:2.9.7
@@ -31,7 +36,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.loki.loadbalancer.server.port=3100"
       - "traefik.http.routers.loki.entrypoints=websecure"
-      - "traefik.http.routers.loki.rule=Host(`$LOKI_DOMAIN_NAME`)"
+      - "traefik.http.routers.loki.rule=Host(`$LOKI_SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.loki.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.loki.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.loki.tls.certresolver=letsencrypt"
       - "traefik.http.routers.loki.middlewares=authelia,error-pages,lan-only,security-headers"
 
@@ -51,7 +58,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.promtail.loadbalancer.server.port=9080"
       - "traefik.http.routers.promtail.entrypoints=websecure"
-      - "traefik.http.routers.promtail.rule=Host(`$PROMTAIL_DOMAIN_NAME`)"
+      - "traefik.http.routers.promtail.rule=Host(`$PROMTAIL_SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.promtail.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.promtail.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.promtail.tls.certresolver=letsencrypt"
       - "traefik.http.routers.promtail.middlewares=authelia,error-pages,lan-only,security-headers"
 
@@ -71,7 +80,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
       - "traefik.http.routers.prometheus.entrypoints=websecure"
-      - "traefik.http.routers.prometheus.rule=Host(`$PROMETHEUS_DOMAIN_NAME`)"
+      - "traefik.http.routers.prometheus.rule=Host(`$PROMETHEUS_SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.prometheus.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.prometheus.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
       - "traefik.http.routers.prometheus.middlewares=authelia,error-pages,lan-only,security-headers"
 

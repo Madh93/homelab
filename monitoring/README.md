@@ -11,6 +11,7 @@
   * [Promtail config](#promtail-config)
   * [Docker setup](#docker-setup)
   * [Authelia setup](#authelia-setup)
+  * [OIDC setup](#oidc-setup)
   * [Enable log sending](#enable-log-sending)
   * [Grafana dashboards](#grafana-dashboards)
 - [Useful links](#useful-links)
@@ -216,10 +217,11 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-GRAFANA_DOMAIN_NAME="grafana.domain.tld"
-LOKI_DOMAIN_NAME="loki.domain.tld"
-PROMTAIL_DOMAIN_NAME="promtail.domain.tld"
-PROMETHEUS_DOMAIN_NAME="prometheus.domain.tld"
+DOMAIN_NAME="domain.tld"
+GRAFANA_SUBDOMAIN="grafana"
+LOKI_SUBDOMAIN="loki"
+PROMTAIL_SUBDOMAIN="promtail"
+PROMETHEUS_SUBDOMAIN="prometheus"
 PUID=1000
 ```
 
@@ -244,6 +246,25 @@ access_control:
         - POST
       resources:
         - "^/loki/api/v1/push"
+```
+
+### OIDC setup
+
+Grafana has built-in support for [OIDC authentication](https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/), allowing users to log in via an external identity provider like [Pocket ID](https://pocket-id.org/). Before proceeding with the Docker setup, you must create a new OIDC client in your provider.
+
+When creating the client, you will need to configure the following callback URL:
+
+- `https://<SUBDOMAIN>.<DOMAIN_NAME>/login/generic_oauth`
+
+For example, based on the variables in the Docker setup, this would be `https://grafana.domain.tld/login/generic_oauth`.
+
+After creating the client, your OIDC provider will give you a **Client ID**, **Client Secret**, **Authorization URL**, and **Token URL**. These values are required to configure the Generic OAuth settings in Grafana under **Administration** -> **Authentication**.
+
+In addition, you must configure the following environment variables in Docker to ensure proper functionality with traefik:
+
+```yml
+- GF_SERVER_ROOT_URL=https://$GRAFANA_SUBDOMAIN.$DOMAIN_NAME
+- GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
 ```
 
 ### Enable log sending
