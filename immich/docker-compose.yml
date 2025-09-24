@@ -55,7 +55,7 @@ services:
       - immich
 
   immich_db:
-    image: ghcr.io/immich-app/postgres:15-vectorchord0.3.0-pgvectors0.2.0
+    image: ghcr.io/immich-app/postgres:15-vectorchord0.4.3-pgvectors0.2.0
     container_name: immich_db
     hostname: immich_db
     restart: unless-stopped
