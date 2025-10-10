@@ -1,6 +1,6 @@
 services:
   karakeep_chrome:
-    image: gcr.io/zenika-hub/alpine-chrome:123
+    image: gcr.io/zenika-hub/alpine-chrome:124
     container_name: karakeep_chrome
     hostname: karakeep_chrome
     restart: unless-stopped
@@ -28,7 +28,7 @@ services:
       - karakeep
 
   karakeep:
-    image: ghcr.io/karakeep-app/karakeep:0.26.0
+    image: ghcr.io/karakeep-app/karakeep:0.27.1
     container_name: karakeep
     hostname: karakeep
     restart: unless-stopped
