@@ -1,0 +1,29 @@
+services:
+  actual:
+    image: ghcr.io/actualbudget/actual:latest
+    container_name: actual
+    hostname: actual
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node src/scripts/health-check.js"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    env_file: '.env' # https://actualbudget.org/docs/config/
+    volumes:
+      - $DOCKER_DATA/actual/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.actual.loadbalancer.server.port=5006"
+      - "traefik.http.routers.actual.entrypoints=websecure"
+      - "traefik.http.routers.actual.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.actual.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.actual.tls.domains[0].sans=*.$DOMAIN_NAME"
+      - "traefik.http.routers.actual.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.actual.middlewares=error-pages,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
