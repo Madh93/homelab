@@ -45,7 +45,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false" # Disable Watchtower
 
   immich_redis:
-    image: valkey/valkey:8-bookworm
+    image: valkey/valkey:9-trixie
     container_name: immich_redis
     hostname: immich_redis
     restart: unless-stopped
