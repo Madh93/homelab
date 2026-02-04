@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:3.5.6
+    image: traefik:3.6.7
     container_name: traefik
     hostname: traefik
     restart: unless-stopped
@@ -35,7 +35,7 @@ services:
       - "--entrypoints.web.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
       - "--entrypoints.websecure.forwardedHeaders.trustedIPs=$HOME_SUBNET,$CF_IPS_V4,$CF_IPS_V6"
       # Big File Uploads (more info at: https://github.com/immich-app/immich/discussions/8872)
-      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=600s"
+      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=3600s"
       # Let's Encrypt
       - "--certificatesResolvers.letsencrypt.acme.email=$LETS_ENCRYPT_EMAIL"
       - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
@@ -71,13 +71,28 @@ services:
       - traefik.http.routers.traefik-callback.middlewares=oidc-auth
       - traefik.http.routers.traefik-callback.service=noop@internal
       # --- Middlewares ---
-      - "traefik.http.routers.traefik.middlewares=oidc-auth,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.traefik.middlewares=lan-only,error-pages,oidc-auth,security-headers"
       # OIDC Authentication
+      # - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.logLevel=DEBUG"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.secret=${OIDC_SECRET}"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.url=https://${OIDC_SUBDOMAIN}.${DOMAIN_NAME}/"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.clientId=${OIDC_CLIENT_ID}"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.clientSecret=${OIDC_CLIENT_SECRET}"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.scopes=${OIDC_SCOPES}"
+      # IPs to Bypass: 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+      - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.bypassAuthenticationRule=HeaderRegexp(`X-Real-Ip`, `^(10|127)\\.`) || HeaderRegexp(`X-Real-Ip`, `^172\\.(1[6-9]|2[0-9]|3[01])\\.`) || HeaderRegexp(`X-Real-Ip`, `^192\\.168\\.`)"
+      # TODO:!!!! Si se supone que hago un bypass, no significaria que en local TODOS los PATHS no requieren del provider?
+      # Aqui esta la doc: https://traefik-oidc-auth.sevensolutions.cc/docs/getting-started/bypass-authentication-rule
+      # Sin embargo he aplicado, y accediendo en teoria desde una red local me sigue pidiendo login... asiq que yo creo que el bypass no lo  hace, o no como yo espero...
+      # Esto hay que testearlo bien a fondo antes de dejarlo asi!!!
+      # Si activo el modo debug lo vere en los logs: https://github.com/sevensolutions/traefik-oidc-auth/blob/09c530e8472eb51b226a36317879f787356b63ff/src/main.go#L105
+      # Hago la pruebas como en el modo debug y efectivamente veo como me lo salta al acceder a notes.mrufus.com (Joplin). Sin embargo, con photos.mrufus.com (Immich), pero tiene sentido
+      # porque immich no usa el middleware de este plugin, ya que se gestiona directamente desde Pocket ID ya que implementa OIDC.
+      # Realmente funciona tal cual estaba pensando, si detecta la IP privada directamente hace un bypass. La cuestion es, si me sirve o no, es decir no me permite ir a grano fino
+      # o filtrar por servicio, sino a nivel global. Si quiero evitar acceso a Metube, no puedo. Pero si por ejemplo quitara este bypass, Tamara al estar registrada podria entrar si
+      # esta en el grupo de Pocket ID. No se si Tiny Auth me aportaria mas ventajas para hilar mas.
+
+
       # IP Whitelist (LAN Only)
       - "traefik.http.middlewares.lan-only.ipallowlist.sourceRange=$HOME_SUBNET"
       # Security Headers: HTTP Strict Transport Security (HSTS)
