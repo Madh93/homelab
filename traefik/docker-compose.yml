@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:3.5.6
+    image: traefik:3.6.7
     container_name: traefik
     hostname: traefik
     restart: unless-stopped
@@ -73,6 +73,7 @@ services:
       # --- Middlewares ---
       - "traefik.http.routers.traefik.middlewares=oidc-auth,error-pages,lan-only,security-headers"
       # OIDC Authentication
+      # - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.logLevel=DEBUG"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.secret=${OIDC_SECRET}"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.url=https://${OIDC_SUBDOMAIN}.${DOMAIN_NAME}/"
       - "traefik.http.middlewares.oidc-auth.plugin.traefik-oidc-auth.provider.clientId=${OIDC_CLIENT_ID}"
