@@ -1,28 +1,21 @@
-version: "3.9"
-
 services:
   qbittorrent_vpn:
-    image: dperson/openvpn-client:latest
+    image: qmcgaw/gluetun:latest
     container_name: qbittorrent_vpn
     hostname: qbittorrent_vpn
     restart: unless-stopped
     cap_add:
-      - net_admin # Required to work!
-    security_opt:
-      - label:disable
-    stdin_open: true
-    tty: true
+      - NET_ADMIN
     devices:
       - /dev/net/tun
-    ports:
-      - 6881:6881     # Bittorrent port forwarding
-      - 6881:6881/udp
-    environment:  # TODO: https://github.com/dperson/openvpn-client/issues/359#issuecomment-761871972
-      TZ: $TZ
-      DNS: $DNS
-      FIREWALL: ''  # VPN Kill Switch (automatically disconnects when VPN connection drops out)
+    environment:
+      - VPN_SERVICE_PROVIDER=$VPN_SERVICE_PROVIDER
+      - VPN_TYPE=$VPN_TYPE
+      - WIREGUARD_PRIVATE_KEY=$WIREGUARD_PRIVATE_KEY
+      - SERVER_COUNTRIES=$SERVER_COUNTRIES
+      - PORT_FORWARD_ONLY=$PORT_FORWARD_ONLY
     volumes:
-      - $DOCKER_DATA/qbittorrent_vpn/config:/vpn # Ensure to create 'vpn.conf' and 'vpn.auth' files!
+      - $DOCKER_DATA/qbittorrent_vpn/config:/gluetun
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -42,9 +35,11 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
       - "traefik.http.routers.qbittorrent.entrypoints=websecure"
-      - "traefik.http.routers.qbittorrent.rule=Host(`$DOMAIN_NAME`)"
+      - "traefik.http.routers.qbittorrent.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.qbittorrent.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.qbittorrent.tls.domains[0].sans=*.$DOMAIN_NAME"
       - "traefik.http.routers.qbittorrent.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.qbittorrent.middlewares=authelia,error-pages,lan-only,security-headers"
+      - "traefik.http.routers.qbittorrent.middlewares=lan-only,error-pages,oidc-auth,security-headers"
 
 networks:
   default:
