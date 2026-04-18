@@ -1,4 +1,4 @@
-# Jellyseerr
+# Seerr
 
 - [About](#about)
 - [Configuration](#configuration)
@@ -7,7 +7,7 @@
 
 ## About
 
-Jellyseerr is a free and open source software application for managing requests for your media library. It is a a fork of Overseerr built to bring support for Jellyfin & Emby media servers.
+Seerr is a free and open source software application for managing requests for your media library. It integrates with the media server of your choice: Jellyfin, Plex, and Emby. In addition, it integrates with your existing services, such as Sonarr, Radarr.
 
 ## Configuration
 
@@ -18,7 +18,8 @@ We create a `.env` file:
 ```shell
 DOCKER_DATA="/docker/data"
 DEFAULT_NETWORK="badassnet"
-DOMAIN_NAME="jellyseerr.domain.tld"
+DOMAIN_NAME="domain.tld"
+SUBDOMAIN="seerr"
 PUID=1000
 PGID=1000
 TZ="Europe/Madrid"
@@ -30,4 +31,4 @@ And deploy:
 
 ## Useful links
 
-- [Jellyseerr](https://github.com/Fallenbagel/jellyseerr)
+- [Seerr](https://github.com/seerr-team/seerr)
