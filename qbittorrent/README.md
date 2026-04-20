@@ -40,6 +40,9 @@ VPN_TYPE="wireguard"
 WIREGUARD_PRIVATE_KEY="supersecret"
 SERVER_COUNTRIES="Spain"
 PORT_FORWARD_ONLY="on"
+VPN_PORT_FORWARDING="on"
+VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- -nv --retry-connrefused --post-data "json={\"listen_port\":{{PORT}},\"current_network_interface\":\"{{VPN_INTERFACE}}\",\"random_port\":false,\"upnp\":false}" http://127.0.0.1:8080/api/v2/app/setPreferences'
+VPN_PORT_FORWARDING_DOWN_COMMAND=/bin/sh -c 'wget -O- -nv --retry-connrefused --post-data "json={\"listen_port\":0,\"current_network_interface\":\"lo\"}" http://127.0.0.1:8080/api/v2/app/setPreferences'
 ```
 
 And deploy:
@@ -85,3 +88,5 @@ access_control:
 - [WireGuard](https://www.wireguard.com/)
 - [ProtonVPN](https://protonvpn.com)
 - [Gluetun VPN client](https://github.com/qdm12/gluetun)
+- [Gluetun with ProtonVPN](https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/protonvpn.md)
+- [Gluetun Port Forwarding](https://github.com/qdm12/gluetun-wiki/blob/main/setup/advanced/vpn-port-forwarding.md)
