@@ -44,6 +44,7 @@ services:
     environment:
       - AUTH_PROXY_USER_CREATION=1
       - AUTH_PROXY_HEADER=Remote-User
+      - TRUSTED_REVERSE_PROXY_NETWORKS=X-Real-Ip
 ```
 
 NOTE: The [current implementation](https://github.com/miniflux/v2/pull/570) only support the `/` endpoint, as the rest are protected by Miniflux.
