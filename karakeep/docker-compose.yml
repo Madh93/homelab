@@ -15,7 +15,7 @@ services:
       - karakeep
 
   karakeep_meilisearch:
-    image: getmeili/meilisearch:v1.13.3
+    image: getmeili/meilisearch:v1.41.0
     container_name: karakeep_meilisearch
     hostname: karakeep_meilisearch
     restart: unless-stopped
@@ -28,7 +28,7 @@ services:
       - karakeep
 
   karakeep:
-    image: ghcr.io/karakeep-app/karakeep:0.27.1
+    image: ghcr.io/karakeep-app/karakeep:0.32.0
     container_name: karakeep
     hostname: karakeep
     restart: unless-stopped
@@ -49,6 +49,8 @@ services:
       - OAUTH_CLIENT_SECRET=$OAUTH_CLIENT_SECRET
       - DISABLE_PASSWORD_AUTH=true
       - OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING=true
+      # Internal Webhooks
+      - CRAWLER_ALLOWED_INTERNAL_HOSTNAMES=n8n
       # AI Providers
       - OPENAI_API_KEY=$OPENAI_API_KEY
       # Configuring different AI Providers: https://docs.karakeep.app/Guides/different-ai-providers/
