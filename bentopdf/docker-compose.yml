@@ -1,0 +1,26 @@
+services:
+  bentopdf:
+    image: ghcr.io/alam00000/bentopdf-simple:latest
+    container_name: bentopdf
+    hostname: bentopdf
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8080']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    env_file: '.env'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.bentopdf.loadbalancer.server.port=8080"
+      - "traefik.http.routers.bentopdf.entrypoints=websecure"
+      - "traefik.http.routers.bentopdf.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.bentopdf.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.bentopdf.tls.domains[0].sans=*.$DOMAIN_NAME"
+      - "traefik.http.routers.bentopdf.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bentopdf.middlewares=error-pages,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
