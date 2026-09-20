@@ -1,0 +1,24 @@
+services:
+  spottarr:
+    image: ghcr.io/spottarr/spottarr:latest
+    container_name: spottarr
+    hostname: spottarr
+    restart: unless-stopped
+    user: "$PUID:$PGID"
+    env_file: '.env'
+    volumes:
+      - $DOCKER_DATA/spottarr/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.spottarr.loadbalancer.server.port=8383"
+      - "traefik.http.routers.spottarr.entrypoints=websecure"
+      - "traefik.http.routers.spottarr.rule=Host(`$SUBDOMAIN.$DOMAIN_NAME`)"
+      - "traefik.http.routers.spottarr.tls.domains[0].main=$DOMAIN_NAME"
+      - "traefik.http.routers.spottarr.tls.domains[0].sans=*.$DOMAIN_NAME"
+      - "traefik.http.routers.spottarr.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.spottarr.middlewares=authelia,error-pages,lan-only,security-headers"
+
+networks:
+  default:
+    name: $DEFAULT_NETWORK
+    external: true
